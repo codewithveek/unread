@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792778738167,
+      "tag": "0000_enable-pgvector",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792778738961,
+      "tag": "0001_init",
+      "breakpoints": true
+    }
+  ]
+}
