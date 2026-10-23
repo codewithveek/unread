@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unread · Sources</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0F12}
+a{color:#8FB8FF}a:hover{color:#B9D2FF}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0E0F12; color: #F2F3F5; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 22px; padding: 24px 24px 0; overflow: hidden">
+    <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.03em">Sources</h1>
+
+    <section aria-label="Listen in your podcast app" style="display: flex; flex-direction: column; gap: 12px; background: #17181D; border: 1px solid #2A2D35; border-radius: 18px; padding: 16px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Listen in your podcast app</h2>
+        <p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A3A8B3">Add this private feed once. New episodes appear every morning.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; background: #0E0F12; border: 1px solid #2A2D35; border-radius: 12px; padding: 0 6px 0 12px; height: 48px">
+        <span style="flex: 1; font: 400 13px 'Geist Mono', monospace; color: #D6D9DF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">getunread.site/feed/k7x2…/rss</span>
+        <button style="height: 36px; padding: 0 12px; border-radius: 9px; border: 0; background: #2A2D35; color: #F2F3F5; font: 500 13px Geist, sans-serif; cursor: pointer">Copy</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button style="height: 44px; border-radius: 12px; border: 1px solid #2A2D35; background: transparent; color: #F2F3F5; font: 500 14px Geist, sans-serif; cursor: pointer">Apple Podcasts</button>
+        <button style="height: 44px; border-radius: 12px; border: 1px solid #2A2D35; background: transparent; color: #F2F3F5; font: 500 14px Geist, sans-serif; cursor: pointer">Pocket Casts</button>
+      </div>
+    </section>
+
+    <section aria-label="Add to your next episode" style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 16px; font-weight: 600">Add to your next episode</h2>
+      <div style="display: flex; gap: 8px">
+        <label style="flex: 1; display: flex; align-items: center; background: #17181D; border: 1px solid #2A2D35; border-radius: 12px; padding: 0 12px; height: 48px">
+          <span style="position: absolute; left: -9999px">Paste a link</span>
+          <input type="url" placeholder="Paste a link" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F2F3F5; font: 400 15px Geist, sans-serif; outline: none">
+        </label>
+        <button style="height: 48px; padding: 0 16px; border-radius: 12px; border: 0; background: {{accent}}; color: #0A1A33; font: 600 14px Geist, sans-serif; cursor: pointer">Add</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #A3A8B3">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>
+        <span>Or forward newsletters to <span style="font-family: 'Geist Mono', monospace; color: #D6D9DF">lv@in.getunread.site</span></span>
+      </div>
+    </section>
+
+    <section aria-label="Saved for tomorrow" style="display: flex; flex-direction: column">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 4px">
+        <h2 style="margin: 0; font-size: 16px; font-weight: 600">Saved for tomorrow</h2>
+        <span style="font: 500 12px 'Geist Mono', monospace; color: #A3A8B3">3 ITEMS</span>
+      </div>
+      <sc-for list="{{saves}}" as="save" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #1F2128">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{accent}}; flex: none"></span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
+            <span style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{save.title}}</span>
+            <span style="font-size: 12px; color: #A3A8B3">{{save.meta}}</span>
+          </div>
+          <button aria-label="Remove from next episode" style="width: 44px; height: 44px; border: 0; background: transparent; color: #A3A8B3; display: flex; align-items: center; justify-content: center; cursor: pointer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #1F2128; padding: 6px 12px 22px; background: #0E0F12">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; text-decoration: none; color: #A3A8B3; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M10 9l5 3-5 3z" fill="currentColor"></path></svg>Today</a>
+    <a href="Onboarding.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; text-decoration: none; color: #A3A8B3; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg>Topics</a>
+    <a href="Sources.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; text-decoration: none; color: #F2F3F5; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l3-8h10l3 8v6H4z"></path><path d="M4 13h5l1 2h4l1-2h5"></path></svg>Sources</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#5B9BFF","options":["#5B9BFF","#7DD3A8","#F5B547","#F08A7A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#5B9BFF',
+      saves: [
+        { title: '[Article you saved this afternoon]', meta: 'Link · added 2h ago' },
+        { title: '[Weekly newsletter issue]', meta: 'Forwarded email · 9 min read' },
+        { title: '[Long read from a blog you follow]', meta: 'RSS · 22 min read' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

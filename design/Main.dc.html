@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unread · Today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0F12}
+a{color:#8FB8FF}a:hover{color:#B9D2FF}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0E0F12; color: #F2F3F5; font-family: Geist, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 8px">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <span style="width: 10px; height: 10px; border-radius: 50%; background: {{accent}}; display: inline-block"></span>
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em">Unread</span>
+    </div>
+    <button aria-label="Account" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #2A2D35; background: #17181D; color: #F2F3F5; font: 600 14px Geist, sans-serif; cursor: pointer">LV</button>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 8px 24px 0; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <p style="margin: 0; font: 500 13px 'Geist Mono', monospace; color: #A3A8B3; letter-spacing: 0.02em">SATURDAY, 24 OCTOBER</p>
+      <h1 style="margin: 0; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -0.03em">Your morning brief</h1>
+    </div>
+
+    <section aria-label="Today's episode" style="background: #17181D; border: 1px solid #2A2D35; border-radius: 20px; overflow: hidden">
+      <svg role="img" aria-label="Generated cover for 24 October" width="342" height="168" viewBox="0 0 342 168" style="display: block">
+        <rect width="342" height="168" fill="#1F2128"></rect>
+        <g fill="{{accent}}">
+          <rect x="18" y="84" width="10" height="64" rx="5"></rect>
+          <rect x="36" y="56" width="10" height="92" rx="5" opacity="0.55"></rect>
+          <rect x="54" y="98" width="10" height="50" rx="5"></rect>
+          <rect x="72" y="40" width="10" height="108" rx="5" opacity="0.35"></rect>
+          <rect x="90" y="70" width="10" height="78" rx="5"></rect>
+          <rect x="108" y="108" width="10" height="40" rx="5" opacity="0.55"></rect>
+          <rect x="126" y="62" width="10" height="86" rx="5"></rect>
+          <rect x="144" y="92" width="10" height="56" rx="5" opacity="0.35"></rect>
+          <rect x="162" y="48" width="10" height="100" rx="5"></rect>
+          <rect x="180" y="116" width="10" height="32" rx="5" opacity="0.55"></rect>
+        </g>
+        <g fill="#F2F3F5" opacity="0.14">
+          <rect x="198" y="76" width="10" height="72" rx="5"></rect>
+          <rect x="216" y="100" width="10" height="48" rx="5"></rect>
+          <rect x="234" y="66" width="10" height="82" rx="5"></rect>
+          <rect x="252" y="112" width="10" height="36" rx="5"></rect>
+          <rect x="270" y="88" width="10" height="60" rx="5"></rect>
+          <rect x="288" y="120" width="10" height="28" rx="5"></rect>
+          <rect x="306" y="96" width="10" height="52" rx="5"></rect>
+        </g>
+        <text x="320" y="44" text-anchor="end" fill="#F2F3F5" font-family="Geist, sans-serif" font-size="40" font-weight="700" letter-spacing="-1.5">24</text>
+        <text x="320" y="64" text-anchor="end" fill="#A3A8B3" font-family="Geist Mono, monospace" font-size="11">OCT · SAT</text>
+      </svg>
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <p style="margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em">12 stories from AI, startups and your saves</p>
+          <p style="margin: 0; font: 400 13px 'Geist Mono', monospace; color: #A3A8B3">18 min · made at 6:00 · 7 saved links</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <button aria-label="Play today's episode" style="width: 56px; height: 56px; border-radius: 50%; border: 0; background: {{accent}}; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="#0A1A33"></path></svg>
+          </button>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+            <div style="height: 4px; border-radius: 2px; background: #2A2D35; overflow: hidden"><div style="width: 22%; height: 4px; background: {{accent}}"></div></div>
+            <div style="display: flex; justify-content: space-between; font: 400 12px 'Geist Mono', monospace; color: #A3A8B3"><span>4:02</span><span>−14:11</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="In this episode" style="display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600">In this episode</h2>
+        <a href="Player.dc.html" style="font-size: 13px; text-decoration: none">Transcript</a>
+      </div>
+      <sc-for list="{{chapters}}" as="chapter" hint-placeholder-count="4">
+        <div style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #1F2128">
+          <span style="font: 500 12px 'Geist Mono', monospace; color: #A3A8B3; width: 34px; padding-top: 3px; flex: none">{{chapter.time}}</span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0">
+            <span style="font-size: 15px; line-height: 1.3; font-weight: 500">{{chapter.title}}</span>
+            <span style="font-size: 12px; color: #A3A8B3">{{chapter.origin}}</span>
+          </div>
+          <sc-if value="{{chapter.playing}}" hint-placeholder-val="{{ false }}">
+            <span aria-label="Playing" style="width: 8px; height: 8px; border-radius: 50%; background: {{accent}}; margin-top: 7px; flex: none"></span>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+
+  <nav aria-label="Main" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #1F2128; padding: 6px 12px 22px; background: #0E0F12">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; text-decoration: none; color: #F2F3F5; font-size: 11px; font-weight: 600">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M10 9l5 3-5 3z" fill="currentColor"></path></svg>Today</a>
+    <a href="Onboarding.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; text-decoration: none; color: #A3A8B3; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg>Topics</a>
+    <a href="Sources.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 0; text-decoration: none; color: #A3A8B3; font-size: 11px; font-weight: 500">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13l3-8h10l3 8v6H4z"></path><path d="M4 13h5l1 2h4l1-2h5"></path></svg>Sources</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#5B9BFF","options":["#5B9BFF","#7DD3A8","#F5B547","#F08A7A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#5B9BFF',
+      chapters: [
+        { time: '0:00', title: 'Why small open models are catching up on coding', origin: 'Topic · AI', playing: false },
+        { time: '3:40', title: 'The pricing page teardown you saved on Tuesday', origin: 'Your save · newsletter', playing: true },
+        { time: '6:15', title: 'What a new EU rule means for app subscriptions', origin: 'Topic · Startups', playing: false },
+        { time: '9:02', title: 'A long read on sleep, in three minutes', origin: 'Your save · link', playing: false }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
