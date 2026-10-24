@@ -1,0 +1,16 @@
+Return-Path: <lucky@example.com>
+Authentication-Results: mx.cloudflare.net; dkim=pass header.d=semafor.com; spf=pass smtp.mailfrom=lucky@example.com
+X-Forwarded-For: lucky@example.com e5aksq66ta@in.getunread.site
+From: Semafor Tech <tech@semafor.com>
+To: lucky@example.com
+Subject: Semafor Tech: the price of thinking
+Message-ID: <semafor-2026-10-25@semafor.com>
+Date: Sun, 25 Oct 2026 06:00:00 +0000
+Content-Type: text/html; charset="UTF-8"
+
+<html><body>
+<h2>OpenAI's reasoning model gets cheaper</h2>
+<p>OpenAI's latest reasoning model, released on Tuesday, is priced at $2 per million input tokens, around 60% below its predecessor. It is available in the API now and arrives in ChatGPT next week.</p>
+<h2>Satellite internet reaches 10 million homes</h2>
+<p>A satellite broadband operator said it now serves 10 million households, double the number a year ago, with the fastest growth in Nigeria, Kenya and Brazil where fibre coverage remains thin.</p>
+</body></html>

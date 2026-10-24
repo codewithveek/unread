@@ -1,0 +1,39 @@
+Return-Path: <lucky@example.com>
+Authentication-Results: mx.cloudflare.net; dkim=pass header.d=morningbrew.com; spf=pass smtp.mailfrom=lucky@example.com; dmarc=pass header.from=morningbrew.com
+X-Forwarded-For: lucky@example.com e5aksq66ta@in.getunread.site
+X-Forwarded-To: e5aksq66ta@in.getunread.site
+From: Morning Brew <crew@morningbrew.com>
+To: lucky@example.com
+Subject: OpenAI's new model, the Fed holds, and more
+List-Id: "Morning Brew" <daily.morningbrew.com>
+Message-ID: <issue-2026-10-24@morningbrew.com>
+Date: Sat, 24 Oct 2026 06:00:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset="UTF-8"
+
+Morning Brew. View in browser.
+
+--b1
+Content-Type: text/html; charset="UTF-8"
+
+<html><head><style>.x{color:red}</style></head><body>
+<div style="display:none;max-height:0">Preheader text you should never hear</div>
+<table><tr><td><a href="https://morningbrew.com/view?utm_source=newsletter">View in browser</a></td></tr>
+<tr><td><p>Good morning. It's Saturday, and the coffee is strong.</p></td></tr>
+<tr><td><h2>OpenAI ships a cheaper reasoning model</h2>
+<p>OpenAI released a new reasoning model on Tuesday priced at <b>$2 per million input tokens</b>, roughly 60% cheaper than its predecessor. The company said the model scores 87.5% on a common maths benchmark. <a href="https://openai.com/blog/new-model?utm_source=brew&amp;utm_medium=email">Read the announcement</a>.</p>
+<p>Developers can use it from today through the API, and it will reach ChatGPT users next week.</p></td></tr>
+<tr><td><h2>Together with Acme Bank</h2><p>Open an account in five minutes and earn 4% interest. Sponsored content.</p></td></tr>
+<tr><td><h2>The Fed holds rates steady</h2>
+<p>The Federal Reserve kept its benchmark rate between 4.25% and 4.5% on Wednesday. Chair Jerome Powell said the committee "is prepared to adjust" if inflation keeps falling, and markets now price one cut in December.</p>
+<p><a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20261021a.htm">Statement</a></p></td></tr>
+<tr><td><h2>Quick hits</h2><ul><li>Spotify raised prices in 12 more markets, adding $1 a month to individual plans.</li><li>A new study links four-day weeks to fewer sick days across 61 UK companies.</li></ul></td></tr>
+<tr><td><img src="https://track.morningbrew.com/open.gif" width="1" height="1"></td></tr>
+<tr><td><p>Share the Brew with a friend.</p></td></tr>
+<tr><td><p>You are receiving this because you signed up for Morning Brew. <a href="https://morningbrew.com/unsubscribe?u=1">Unsubscribe</a></p>
+<p>Morning Brew Inc., 22 W 19th St, New York, NY. Copyright 2026.</p></td></tr>
+</table></body></html>
+--b1--

@@ -1,0 +1,30 @@
+Return-Path: <lucky@example.com>
+Authentication-Results: mx.cloudflare.net; dkim=pass header.d=example.com; spf=pass smtp.mailfrom=lucky@example.com
+From: Lucky Victory <lucky@example.com>
+To: e5aksq66ta@in.getunread.site
+Subject: Fwd: The Hustle: OpenAI's price cut
+Message-ID: <fwd-1@example.com>
+Date: Sat, 24 Oct 2026 07:10:00 +0000
+Content-Type: text/plain; charset="UTF-8"
+
+---------- Forwarded message ---------
+From: The Hustle <news@thehustle.co>
+Date: Sat, Oct 24, 2026 at 6:30 AM
+Subject: OpenAI's price cut
+To: <lucky@example.com>
+
+# OpenAI cuts the price of reasoning
+
+OpenAI's newest reasoning model costs $2 per million input tokens, down about
+60% on the last version. The launch happened on Tuesday, and the model is
+available in the API now.
+
+That price puts pressure on Anthropic and Google, who both cut prices in the
+spring. Expect another round of cuts before the end of the year.
+
+# Why bakeries love subscriptions
+
+Bakeries in Lisbon are selling monthly bread subscriptions, and some report
+that 30% of revenue now comes from subscribers who pay up front.
+
+Unsubscribe: https://thehustle.co/unsubscribe

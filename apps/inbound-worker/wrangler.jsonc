@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "unread-inbound",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  // Secrets (wrangler secret put): INBOUND_WEBHOOK_URL, INBOUND_WEBHOOK_SECRET
+  "vars": {
+    "MAX_BYTES": "2097152"
+  },
+  "observability": { "enabled": true }
+}

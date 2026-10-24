@@ -1,0 +1,60 @@
+{
+  "name": "@unread/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1156.0",
+    "@aws-sdk/s3-request-presigner": "^3.1156.0",
+    "@elevenlabs/elevenlabs-js": "2.74.0",
+    "@huggingface/transformers": "^3.8.1",
+    "@mozilla/readability": "^0.6.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "@unread/db": "workspace:*",
+    "cheerio": "^1.2.0",
+    "domhandler": "^6.0.1",
+    "drizzle-orm": "0.45.4",
+    "kokoro-js": "^1.2.1",
+    "linkedom": "^0.18.14",
+    "postal-mime": "^4.1.4",
+    "ulid": "3.0.2",
+    "undici": "^8.12.3",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  },
+  "exports": {
+    "./config": "./src/config.ts",
+    "./storage": "./src/storage/index.ts",
+    "./inbound": "./src/inbound/index.ts",
+    "./inbound/signature": "./src/inbound/signature.ts",
+    "./links": "./src/links/index.ts",
+    "./model": "./src/model/index.ts",
+    "./embeddings": "./src/embeddings/index.ts",
+    "./plans": "./src/plans/index.ts",
+    "./pipeline": "./src/pipeline/index.ts",
+    "./util/dates": "./src/util/dates.ts",
+    "./episodes": "./src/episodes/index.ts",
+    "./voice": "./src/voice/index.ts",
+    "./audio": "./src/audio/index.ts",
+    "./cover": "./src/cover/index.ts",
+    "./feed": "./src/feed/index.ts",
+    "./promo": "./src/promo/index.ts",
+    "./mail": "./src/mail/index.ts",
+    "./util/rate-limit": "./src/util/rate-limit.ts",
+    "./voice/voices": "./src/voice/voices.ts",
+    "./episodes/requests": "./src/episodes/requests.ts",
+    "./episodes/transcript": "./src/episodes/transcript.ts",
+    "./news": "./src/news/index.ts",
+    "./billing": "./src/billing/index.ts",
+    "./voice/elevenlabs": "./src/voice/elevenlabs.ts"
+  }
+}
