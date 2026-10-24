@@ -52,7 +52,7 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 3. `pnpm generate-assets` for the SFX (ask before spending credits).
 4. Accounts + deploy (docs/deploy.md): Auth0 app, Cloudflare Email Routing + `wrangler deploy`, R2 bucket, Render blueprint, Temporal Cloud (optional), Bachs sandbox products + webhook, SerpApi, Resend domain.
 5. Measure Kokoro speed on the Render instance; tune `KOKORO_CONCURRENCY`.
-6. Landing page `/` is minimal (hero, two CTAs, privacy link); a fuller marketing page is not built.
+6. Landing page `/` follows `docs/design/Landing.dc.html` (`features/landing/`). Still placeholders: `PLUS_PRICE` (`[PRICE]`), the sample audio `public/sample-episode.mp3` (not made yet; the player shows "coming soon" when it is missing; chapter `startSeconds` must match it), and there is no Terms page, so the footer leaves out that link.
 7. PRD inconsistencies resolved by assumption: Free voices 4 (§8) not 3 (§9); Free cap = 4 episodes/month; `/inbound/email` writes `items` (not `saved_items`).
 
 ## Working with this user

@@ -10,6 +10,8 @@
   color-scheme: dark;
 
   --ground: #0e0f12;
+  /* Alternate band on the landing page. */
+  --ground-2: #121318;
   --surface: #17181d;
   --surface-2: #1f2128;
   --line: #2a2d35;
@@ -49,6 +51,7 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --color-ground: var(--ground);
+  --color-ground-2: var(--ground-2);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-line: var(--line);
