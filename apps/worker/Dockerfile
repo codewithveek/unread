@@ -16,7 +16,7 @@ RUN pnpm install --frozen-lockfile --filter "@unread/worker..."
 ENV NODE_ENV=production \
     MODEL_CACHE_DIR=/app/.models \
     FFMPEG_PATH=ffmpeg
-# Bake the ONNX models into the image (DATABASE_URL is only needed to satisfy config parsing).
-RUN DATABASE_URL=postgres://build:build@localhost:5432/build pnpm --filter @unread/worker warm-models
+# Bake the ONNX models into the image (PG_URL is only needed to satisfy config parsing).
+RUN PG_URL=postgres://build:build@localhost:5432/build pnpm --filter @unread/worker warm-models
 
 CMD ["pnpm", "--filter", "@unread/worker", "start"]

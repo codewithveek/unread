@@ -7,13 +7,12 @@ import { buildScript, type EpisodeScript, MAX_CHAPTER_CHARS, MIN_CHAPTER_CHARS, 
 import { loadPlanContext } from "../plans";
 import { getJson, putJson, storageKeys } from "../storage";
 import { spokenDate } from "../util/dates";
+import { DEFAULT_ELEVENLABS_VOICE } from "../voice/elevenlabs";
 import { type VoiceClip, withVoiceCache } from "../voice";
 import type { EpisodeDeps } from "./deps";
 import { recordSteps, trackStep } from "./step-tracker";
 import type { EpisodeTranscript } from "./transcript";
 
-/** Default ElevenLabs voice until the user picks one (set with the ElevenLabs provider). */
-export const DEFAULT_ELEVENLABS_VOICE = "JBFqnCBsd6RMkjVDRZzb";
 
 interface ScriptOutput {
   script: EpisodeScript;
@@ -208,7 +207,10 @@ export async function voiceEpisode(deps: EpisodeDeps, episodeId: string, heartbe
     outputRef: voiceKey,
     run: async () => {
       const providerId = episode.voiceProvider ?? "kokoro";
-      const provider = withVoiceCache(deps.voiceFor(providerId), storage);
+      // Studio quality is a Plus option; trials use Flash (prd §8.3 caps trial cost).
+      const ctx = await loadPlanContext({ db, userId: user.id, now: nowOf(deps) });
+      const quality = providerId === "elevenlabs" && ctx.plan.source === "paid" ? user.voiceQuality : "flash";
+      const provider = withVoiceCache(deps.voiceFor(providerId, { quality }), storage);
       const voiceId = providerId === "kokoro" ? user.kokoroVoiceId : (user.elevenlabsVoiceId ?? DEFAULT_ELEVENLABS_VOICE);
 
       const texts = [

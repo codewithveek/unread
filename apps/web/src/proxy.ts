@@ -10,5 +10,5 @@ export async function proxy(request: Request) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|sitemap.xml|robots.txt|inbound/|feed/|audio/|billing/webhooks/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|sitemap.xml|robots.txt|inbound/|feed/|audio/|billing/webhooks/|voices/).*)"],
 };

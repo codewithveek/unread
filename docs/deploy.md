@@ -3,8 +3,8 @@
 Everything except secrets is in the repo: `render.yaml` (web + worker), `apps/worker/Dockerfile`, `apps/inbound-worker/wrangler.jsonc`.
 
 ## 1. Database: Tiger Cloud
-1. Create a service (Postgres + TimescaleDB). Copy the connection string and add `?sslmode=require`.
-2. `DATABASE_URL=… pnpm db:migrate`. Migration 0000 enables pgvector; 0002 turns `listening_events` into a hypertable.
+1. Create a service (Postgres + TimescaleDB). Copy the connection string (with `?sslmode=require`) into `PG_URL`.
+2. `PG_URL=… pnpm db:migrate`. Migration 0000 enables pgvector; 0002 turns `listening_events` into a hypertable.
 
 ## 2. Object storage: Cloudflare R2
 Create a bucket (private) and an API token with read/write on it. Set `STORAGE_DRIVER=s3`, `S3_BUCKET`, `S3_ENDPOINT=https://<account>.r2.cloudflarestorage.com`, `S3_REGION=auto`, and the keys.
@@ -35,10 +35,10 @@ Temporal Cloud namespace + API key → `TEMPORAL_ADDRESS` (e.g. `<ns>.<acct>.tmp
 ## 8. Providers
 - `GEMINI_API_KEY` (Google AI Studio) and/or `OPENROUTER_API_KEY`.
 - `SERPAPI_API_KEY` for opt-in news.
-- `ELEVENLABS_API_KEY` for Plus/trials and the SFX set.
+- `ELEVENLABS_API_KEY` for Plus/trials and Studio previews; then run `pnpm generate-assets` once to create the SFX set.
 - `RESEND_API_KEY` + a verified sending domain for trial emails.
 
 ## Checks after deploy
 - `/privacy` responds (health check). Sign in → onboarding → forward one newsletter → it appears in Sources.
-- `pnpm promo create --code LAUNCH --days 14 --episodes 3 --max 100` (with production `DATABASE_URL`).
+- `pnpm promo create --code LAUNCH --days 14 --episodes 3 --max 100` (with production `PG_URL`).
 - Make one now → an episode appears; add the feed to Pocket Casts.

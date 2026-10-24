@@ -55,6 +55,7 @@ export const pipelineStep = pgEnum("pipeline_step", [
 ]);
 export const stepRunStatus = pgEnum("step_run_status", ["running", "succeeded", "failed"]);
 export const voiceProvider = pgEnum("voice_provider", ["kokoro", "elevenlabs"]);
+export const voiceQuality = pgEnum("voice_quality", ["flash", "studio"]);
 export const trialEndedReason = pgEnum("trial_ended_reason", ["episodes", "expired", "upgraded"]);
 /** Our own subscription states; Bachs statuses are mapped onto these in the webhook handler. */
 export const subscriptionStatus = pgEnum("subscription_status", [
@@ -96,6 +97,8 @@ export const users = pgTable(
     kokoroVoiceId: text().notNull().default("af_heart"),
     /** ElevenLabs voice id; null until picked (Plus or trial). */
     elevenlabsVoiceId: text(),
+    /** Plus: Flash (default) or "Studio voices" (prd §8). */
+    voiceQuality: voiceQuality().notNull().default("flash"),
     newsOptIn: boolean().notNull().default(false),
     newsMode: newsMode().notNull().default("fill"),
     /** ISO 3166-1 alpha-2 news edition; set only when news is opted in (P5). */

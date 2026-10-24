@@ -11,9 +11,10 @@
 - **Assembly:** ffmpeg, one pass. Lines are joined with 0.28 s pauses, chapters with 0.7 s pauses plus an optional transition SFX, an optional intro and outro sting, `loudnorm=I=-16:TP=-1.5`, MP3 at 96 kbps mono. Chapter and per-line start times come from exact sample counts, so the transcript can highlight the current line.
 - **Users keep one voice per provider** (`kokoro_voice_id`, `elevenlabs_voice_id`), so a trial ending loses nothing.
 
-## Pending: ElevenLabs (Plus, trials, SFX)
-The user ran `npx @elevenlabs/cli onboard init`. Its rules say no ElevenLabs code until `ELEVENLABS_API_KEY` is set and `onboard check` passes. Once it does:
-- `ElevenLabsVoiceProvider` (Flash by default, Multilingual v2/v3 "Studio voices"), using request stitching where the model supports it.
-- A voice library picker for Plus, and a cached 10-second "Upgrade to Studio voices" preview.
-- The fixed SFX set (intro sting, chapter transition, outro), generated once into `audio_assets` (`sfx-intro`, `sfx-transition`, `sfx-outro`). Assembly already picks them up when present.
-Until then, Plus and trial episodes fail with a friendly message ("the Studio voice isn't available right now") and earlier episodes stay.
+## ElevenLabs (Plus, trials, previews, SFX)
+Set up with the ElevenLabs CLI onboarding (`onboard init` → `check`, SDK `@elevenlabs/elevenlabs-js` 2.74; the key comes only from `ELEVENLABS_API_KEY`), written following ElevenLabs' text-to-speech and sound-effects skills.
+- **Models:** Standard = `eleven_flash_v2_5` (≈ $0.04 / 1K chars). Studio = `eleven_v4` (≈ $0.08 / 1K): the skill lists v4 as the current highest-quality model, superseding the Multilingual v2/v3 named in the PRD. Studio is for paid Plus; trials use Standard to cap trial cost. Saved per user in `users.voice_quality`.
+- **Synthesis:** `textToSpeech.convert(voiceId, { modelId, outputFormat: "pcm_24000", previousText, nextText })`. Request stitching passes the neighbouring lines. 16-bit PCM is decoded straight into the same 24 kHz pipeline as Kokoro.
+- **Voice picker (Plus):** `voices.search` (the account's voices, including library voices added to it), cached for an hour, using ElevenLabs' own `previewUrl` clips. The default is George (`JBFqnCBsd6RMkjVDRZzb`).
+- **"Upgrade to Studio voices" (Free):** `GET /voice-preview/<voiceId>` generates the same intro once per voice with the Studio model, caches it in storage (`audio_assets` `preview-<id>`), and is limited to signed-in users, known voices, and 10 new previews an hour per user.
+- **SFX:** `pnpm generate-assets` creates `sfx-intro` (2.5 s), `sfx-transition` (1 s) and `sfx-outro` (2.5 s) with `textToSoundEffects.convert`, once. Assembly picks them up for every plan.

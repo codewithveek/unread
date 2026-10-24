@@ -2,7 +2,7 @@
 envVarGroups:
   - name: unread-shared
     envVars:
-      - key: DATABASE_URL
+      - key: PG_URL
         sync: false
       - key: APP_BASE_URL
         value: https://getunread.site

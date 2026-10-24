@@ -34,7 +34,7 @@ private RSS feed (/feed/<token>.xml) + web player (Next.js, apps/web)
 | U0 Repo, Next.js, schema, Auth0, tokens | Done |
 | U1 Inbound email (Cloudflare), verified senders, cleaning, Gmail code | Done (needs Cloudflare deploy) |
 | U2 Cluster, plan, script, check + `pnpm brief` | Done (needs a Gemma key for real runs) |
-| U3 Voice, cover, publish, feed | Done with Kokoro; ElevenLabs waits for its API key |
+| U3 Voice, cover, publish, feed | Done (Kokoro + ElevenLabs); run `pnpm generate-assets` once for SFX |
 | U4 UI, responsive, global player | Done |
 | U5 Links, news, plans, promos, Bachs, Temporal, deploy config | Done in code; needs provider accounts + deploy |
 | U6 Submission | Yours |
@@ -46,11 +46,11 @@ Node 22, pnpm 10, Postgres 16 with pgvector, ffmpeg.
 ```sh
 pnpm install
 cp .env.example apps/web/.env.local          # fill in what you have
-DATABASE_URL=… pnpm db:migrate
+PG_URL=… pnpm db:migrate
 pnpm dev                                     # web on :3000
-DATABASE_URL=… pnpm worker                   # episodes (polls without Temporal)
-DATABASE_URL=… pnpm brief --user <id>        # script JSON only (needs GEMINI_API_KEY or OPENROUTER_API_KEY)
-DATABASE_URL=… pnpm make-episode --user <id> # full episode in-process
+PG_URL=… pnpm worker                   # episodes (polls without Temporal)
+PG_URL=… pnpm brief --user <id>        # script JSON only (needs GEMINI_API_KEY or OPENROUTER_API_KEY)
+PG_URL=… pnpm make-episode --user <id> # full episode in-process
 ```
 
 ## Tests

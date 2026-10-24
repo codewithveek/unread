@@ -15,6 +15,7 @@ import { db } from "@/lib/db";
 import { storage } from "@/lib/storage";
 import { planContextFor } from "./plan-context";
 import { applyPlanLimits, episodePrefsSchema, isFreeVoice } from "./rules";
+import { isStudioVoice } from "./studio-voices";
 
 export async function updateEpisodePrefsAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const { user } = await requireUser();
@@ -31,6 +32,7 @@ export async function updateVoiceAction(_prev: ActionState, formData: FormData):
   const { user } = await requireUser();
   const kokoro = String(formData.get("kokoroVoiceId") ?? "");
   const eleven = String(formData.get("elevenlabsVoiceId") ?? "");
+  const quality = formData.get("voiceQuality");
   const { plan } = await planContextFor(user.id);
   const update: Partial<typeof schema.users.$inferInsert> = {};
   if (kokoro) {
@@ -39,8 +41,12 @@ export async function updateVoiceAction(_prev: ActionState, formData: FormData):
   }
   if (eleven) {
     if (plan.plan !== "plus") return { error: "Studio voices come with Plus." };
-    if (!/^[A-Za-z0-9]{10,40}$/.test(eleven)) return { error: "Unknown voice." };
+    if (!/^[A-Za-z0-9]{10,40}$/.test(eleven) || !(await isStudioVoice(eleven))) return { error: "Unknown voice." };
     update.elevenlabsVoiceId = eleven;
+  }
+  if (quality === "flash" || quality === "studio") {
+    // Studio quality is for paid Plus; trials stay on the standard model.
+    update.voiceQuality = quality === "studio" && plan.source !== "paid" ? "flash" : quality;
   }
   await db().update(schema.users).set(update).where(eq(schema.users.id, user.id));
   revalidatePath("/settings");

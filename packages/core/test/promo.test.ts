@@ -54,7 +54,7 @@ describe.skipIf(!testDatabaseUrl)("promo codes", () => {
     await redeemPromoCode({ db, userId: user.id, code: await newCode({ trialDays: 5 }), emailVerified: true, now });
     const sent: MailMessage[] = [];
     const mailer = { send: async (m: MailMessage) => void sent.push(m) };
-    const config = loadConfig({ ...process.env, DATABASE_URL: testDatabaseUrl, APP_BASE_URL: "https://getunread.site" });
+    const config = loadConfig({ ...process.env, PG_URL: testDatabaseUrl, DATABASE_URL: testDatabaseUrl, APP_BASE_URL: "https://getunread.site" });
     const at = (days: number) => new Date(now.getTime() + days * 86_400_000);
 
     await runTrialLifecycle({ db, config, now: at(1), mailer });

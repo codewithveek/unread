@@ -93,7 +93,8 @@ function storageConfig(env: Env): StorageConfig {
   };
 }
 
+/** `PG_URL` (Tiger Data) wins over `DATABASE_URL`, which stays as a fallback for local setups. */
 export function loadConfig(source: Record<string, string | undefined> = process.env): CoreConfig {
-  const env = envSchema.parse(source);
+  const env = envSchema.parse({ ...source, DATABASE_URL: source.PG_URL || source.DATABASE_URL });
   return { env, storage: storageConfig(env) };
 }

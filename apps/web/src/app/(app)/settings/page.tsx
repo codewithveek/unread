@@ -5,6 +5,8 @@ import { SectionCard } from "@/components/ui/section-card";
 import { rotateAliasAction, rotateFeedAction } from "@/features/settings/actions";
 import { DeleteAccountForm, EpisodePrefsForm, PromoForm, VoiceForm } from "@/features/settings/forms";
 import { planContextFor } from "@/features/settings/plan-context";
+import { StudioPreviewButton, StudioVoiceForm } from "@/features/settings/studio-voice-form";
+import { DEFAULT_ELEVENLABS_VOICE, studioVoices } from "@/features/settings/studio-voices";
 import { PageContainer } from "@/features/shell/page-container";
 import { PageHeading } from "@/features/shell/page-heading";
 import { requireUser } from "@/features/users/current-user";
@@ -32,6 +34,8 @@ export default async function SettingsPage() {
   const paid = ctx.plan.source === "paid";
   const planLabel = paid ? "Plus" : ctx.plan.source === "trial" ? "Plus trial" : "Free";
   const trial = ctx.plan.trial;
+  const voices = ctx.plan.plan === "plus" ? await studioVoices() : [];
+  const studioReady = Boolean(env.ELEVENLABS_API_KEY);
 
   return (
     <PageContainer className="flex flex-col gap-6">
@@ -99,6 +103,16 @@ export default async function SettingsPage() {
             title="Voice"
             description={ctx.plan.plan === "plus" ? "Studio episodes use ElevenLabs. When Plus ends, episodes switch to this free voice." : "Free episodes use Kokoro, an open voice model that runs on our servers."}
           >
+            {ctx.plan.plan === "plus" && voices.length > 0 ? (
+              <StudioVoiceForm
+                voices={voices}
+                selected={user.elevenlabsVoiceId ?? DEFAULT_ELEVENLABS_VOICE}
+                quality={user.voiceQuality}
+                canUseStudio={paid}
+              />
+            ) : null}
+            {ctx.plan.plan === "free" && studioReady ? <StudioPreviewButton voiceId={DEFAULT_ELEVENLABS_VOICE} /> : null}
+            <h3 className="m-0 pt-2 text-[13px] font-semibold text-text-2">{ctx.plan.plan === "plus" ? "Free voice (used if Plus ends)" : "Free voice"}</h3>
             <VoiceForm kokoroVoiceId={user.kokoroVoiceId} />
           </SectionCard>
 

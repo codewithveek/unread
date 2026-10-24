@@ -3,7 +3,7 @@ import type { CoreConfig } from "../config";
 import type { Embedder } from "../embeddings";
 import type { ModelClient } from "../model";
 import type { Storage } from "../storage";
-import type { VoiceProvider } from "../voice";
+import type { ElevenLabsQuality, VoiceProvider } from "../voice";
 
 export interface EpisodeDeps {
   config: CoreConfig;
@@ -11,6 +11,6 @@ export interface EpisodeDeps {
   storage: Storage;
   model: () => ModelClient;
   embedder: Embedder;
-  voiceFor: (id: VoiceProviderId) => VoiceProvider;
+  voiceFor: (id: VoiceProviderId, options?: { quality?: ElevenLabsQuality }) => VoiceProvider;
   now?: () => Date;
 }

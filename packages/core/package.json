@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1156.0",
     "@aws-sdk/s3-request-presigner": "^3.1156.0",
+    "@elevenlabs/elevenlabs-js": "2.74.0",
     "@huggingface/transformers": "^3.8.1",
     "@mozilla/readability": "^0.6.0",
     "@resvg/resvg-js": "^2.6.2",
@@ -53,6 +54,7 @@
     "./episodes/requests": "./src/episodes/requests.ts",
     "./episodes/transcript": "./src/episodes/transcript.ts",
     "./news": "./src/news/index.ts",
-    "./billing": "./src/billing/index.ts"
+    "./billing": "./src/billing/index.ts",
+    "./voice/elevenlabs": "./src/voice/elevenlabs.ts"
   }
 }

@@ -16,6 +16,7 @@
     "brief": "pnpm --filter @unread/worker brief",
     "make-episode": "pnpm --filter @unread/worker make-episode",
     "worker": "pnpm --filter @unread/worker start",
-    "promo": "pnpm --filter @unread/worker promo"
+    "promo": "pnpm --filter @unread/worker promo",
+    "generate-assets": "pnpm --filter @unread/worker generate-assets"
   }
 }

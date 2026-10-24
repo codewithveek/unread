@@ -12,8 +12,8 @@ Your newsletters as a podcast. Spec: `docs/prd-unread.md` (v2). UI reference: `d
 ## Commands
 - `pnpm dev` / `pnpm build`
 - `pnpm typecheck`, `pnpm lint`, `pnpm test`
-- `pnpm db:generate` (after schema edits; drizzle-kit needs a TTY for rename prompts), `pnpm db:migrate` (needs `DATABASE_URL`)
-- `pnpm brief --user <id>`, `pnpm make-episode --user <id>`, `pnpm worker`, `pnpm promo create|list`
+- `pnpm db:generate` (after schema edits; drizzle-kit needs a TTY for rename prompts), `pnpm db:migrate` (needs `PG_URL`; `DATABASE_URL` is the fallback)
+- `pnpm brief --user <id>`, `pnpm make-episode --user <id>`, `pnpm worker`, `pnpm promo create|list`, `pnpm generate-assets` (ElevenLabs SFX, once)
 - Integration tests: `TEST_DATABASE_URL=… [RUN_EMBEDDING_TESTS=1] [RUN_TEMPORAL_TESTS=1] pnpm test`
 
 ## Code standards

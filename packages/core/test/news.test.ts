@@ -31,7 +31,7 @@ describe.skipIf(!testDatabaseUrl)("opt-in news", () => {
   });
 
   it("respects opt-in and the fill mode", async () => {
-    const config = loadConfig({ ...process.env, DATABASE_URL: testDatabaseUrl, SERPAPI_API_KEY: "" });
+    const config = loadConfig({ ...process.env, PG_URL: testDatabaseUrl, DATABASE_URL: testDatabaseUrl, SERPAPI_API_KEY: "" });
     const deps = { config, db, storage: tempStorage() } as unknown as EpisodeDeps;
     const user = await createTestUser(db, { alias: randomAlias(), email: "o@example.com" });
     // Opted out (default): nothing, even with a key.

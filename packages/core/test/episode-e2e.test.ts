@@ -20,7 +20,7 @@ const run = Boolean(testDatabaseUrl && process.env.RUN_EMBEDDING_TESTS);
 describe.skipIf(!run)("makeEpisode end to end (real EmbeddingGemma + Kokoro + ffmpeg)", () => {
   const db = testDb();
   const storage = tempStorage();
-  const config = loadConfig({ ...process.env, DATABASE_URL: testDatabaseUrl });
+  const config = loadConfig({ ...process.env, PG_URL: testDatabaseUrl, DATABASE_URL: testDatabaseUrl });
   const kokoro = createKokoroProvider({ modelId: config.env.KOKORO_MODEL, concurrency: 2 });
   // Stand-in for ElevenLabs: silent clips, so trial accounting can be tested without the API.
   const studio: VoiceProvider = {

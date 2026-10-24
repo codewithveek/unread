@@ -12,7 +12,8 @@
     "make-episode": "tsx src/cli/make-episode.ts",
     "dispatch": "tsx src/cli/dispatch.ts",
     "promo": "tsx src/cli/promo.ts",
-    "warm-models": "tsx src/cli/warm-models.ts"
+    "warm-models": "tsx src/cli/warm-models.ts",
+    "generate-assets": "tsx src/cli/generate-assets.ts"
   },
   "dependencies": {
     "@temporalio/activity": "1.24.0",
