@@ -1,6 +1,9 @@
 # Unread
 
-Your newsletters as a podcast. Spec: `docs/prd-unread.md` (v2). UI reference: `docs/design/` (phone canvases; desktop rules in PRD §9). Decisions: `docs/decisions/`.
+Your newsletters as a podcast. Spec: `docs/prd-unread.md` (v2). UI reference: `docs/design/` (phone canvases; desktop rules in PRD §9). Decisions: `docs/decisions/`. Path-scoped rules: `.claude/rules/`.
+
+Current status, environment facts and open items (keep it updated):
+@docs/project-memory.md
 
 ## Layout
 - `apps/web`: Next.js 16 App Router (UI + route handlers). Auth0 via `src/proxy.ts`.
