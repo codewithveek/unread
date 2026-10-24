@@ -48,6 +48,15 @@ export const pipelineStep = pgEnum("pipeline_step", [
   "publish",
 ]);
 export const stepRunStatus = pgEnum("step_run_status", ["running", "succeeded", "failed"]);
+export const voiceProvider = pgEnum("voice_provider", ["kokoro", "elevenlabs"]);
+/** Our own subscription states; Bachs statuses are mapped onto these in the webhook handler. */
+export const subscriptionStatus = pgEnum("subscription_status", [
+  "trialing",
+  "active",
+  "past_due",
+  "cancelled",
+  "expired",
+]);
 
 const id = () =>
   text()
@@ -62,6 +71,7 @@ export const users = pgTable(
     id: id(),
     auth0Sub: text().notNull(),
     email: text(),
+    /** Paid plan, written only by Bachs webhooks. Features use the effective plan (paid OR promo trial). */
     plan: plan().notNull().default("free"),
     /** IANA timezone, e.g. Africa/Lagos. */
     timezone: text().notNull().default("UTC"),
@@ -72,8 +82,13 @@ export const users = pgTable(
     /** 0 = Sunday … 6 = Saturday; used when cadence is weekly. */
     weeklyDay: integer().notNull().default(1),
     episodeMinutes: integer().notNull().default(10),
-    /** ElevenLabs voice id; null until picked in onboarding. */
-    voiceId: text(),
+    /**
+     * One voice per provider, so a promo trial ending (ElevenLabs → Kokoro)
+     * loses nothing (prd §8.3). Effective plan picks which one is used.
+     */
+    kokoroVoiceId: text().notNull().default("af_heart"),
+    /** ElevenLabs voice id; null until picked (Plus or trial). */
+    elevenlabsVoiceId: text(),
     newsOptIn: boolean().notNull().default(false),
     newsMode: newsMode().notNull().default("fill"),
     /** ISO 3166-1 alpha-2 news edition; set only when news is opted in (P5). */
@@ -218,6 +233,7 @@ export const episodes = pgTable(
     durationS: real(),
     /** Characters sent to ElevenLabs; the main cost driver (prd §8). */
     characters: integer(),
+    voiceProvider: voiceProvider(),
     voiceModel: text(),
     costCents: integer(),
     audioKey: text(),
@@ -333,10 +349,86 @@ export const stepRuns = pgTable(
   (t) => [uniqueIndex("step_runs_episode_step_attempt_key").on(t.episodeId, t.step, t.attempt)],
 );
 
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: id(),
+    userId: text()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    bachsCustomerId: text().notNull(),
+    bachsSubscriptionId: text().notNull(),
+    productId: text().notNull(),
+    status: subscriptionStatus().notNull(),
+    currentPeriodEnd: timestamp({ withTimezone: true }),
+    cancelAtPeriodEnd: boolean().notNull().default(false),
+    updatedAt: timestamp({ withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    uniqueIndex("subscriptions_bachs_subscription_key").on(t.bachsSubscriptionId),
+    index("subscriptions_user_idx").on(t.userId),
+  ],
+);
+
+/** Every Bachs webhook, keyed by its event id; makes replays no-ops (prd §8.2). */
+export const billingEvents = pgTable("billing_events", {
+  id: text().primaryKey(),
+  type: text().notNull(),
+  payload: jsonb().notNull(),
+  receivedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  processedAt: timestamp({ withTimezone: true }),
+});
+
+export const promoCodes = pgTable(
+  "promo_codes",
+  {
+    id: id(),
+    code: text().notNull(),
+    trialDays: integer().notNull(),
+    maxRedemptions: integer(),
+    redeemedCount: integer().notNull().default(0),
+    expiresAt: timestamp({ withTimezone: true }),
+    active: boolean().notNull().default(true),
+    note: text(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex("promo_codes_code_key").on(sql`lower(${t.code})`),
+    check("promo_codes_trial_days_check", sql`${t.trialDays} > 0`),
+    check(
+      "promo_codes_redemptions_check",
+      sql`${t.maxRedemptions} is null or ${t.redeemedCount} <= ${t.maxRedemptions}`,
+    ),
+  ],
+);
+
+export const promoRedemptions = pgTable(
+  "promo_redemptions",
+  {
+    id: id(),
+    codeId: text()
+      .notNull()
+      .references(() => promoCodes.id, { onDelete: "cascade" }),
+    userId: text()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    redeemedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    trialEndsAt: timestamp({ withTimezone: true }).notNull(),
+  },
+  (t) => [
+    uniqueIndex("promo_redemptions_code_user_key").on(t.codeId, t.userId),
+    index("promo_redemptions_user_trial_idx").on(t.userId, t.trialEndsAt),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Episode = typeof episodes.$inferSelect;
 export type Chapter = typeof chapters.$inferSelect;
 export type Plan = (typeof plan.enumValues)[number];
+export type VoiceProvider = (typeof voiceProvider.enumValues)[number];
 export type Cadence = (typeof cadence.enumValues)[number];
 export type PipelineStep = (typeof pipelineStep.enumValues)[number];

@@ -1,6 +1,6 @@
 # 0003 · Database, schema and ids
 
-**Status:** Accepted (U0, 2026-10-23; revised for PRD v2 on 2026-10-24)
+**Status:** Accepted (U0, 2026-10-23; revised for PRD v2 and the Kokoro/Bachs/promo update on 2026-10-24)
 
 ## Decision
 - **Postgres on Tiger Data (Tiger Cloud)**, with two extensions:
@@ -12,13 +12,17 @@
 - **Embeddings are `vector(768)`** on `items`: EmbeddingGemma's full output size, with a cosine HNSW index. It is trained Matryoshka-style, so it can be truncated to 512/256/128 later (a migration plus a re-embed).
 
 ## Tables (PRD v2 §7)
-`users` (plan, cadence, weekly day, news opt-in/mode/edition, feed token, inbound alias), `verified_senders`, `newsletters`, `inbound_messages`, `items`, `user_topics`, `episodes` (characters, voice model, cost), `chapters`, `chapter_sources` → `items`, `heard_items` (with `cluster_key`), `listening_events` (hypertable), `usage_monthly`, `step_runs`.
+`users` (plan, cadence, weekly day, news opt-in/mode/edition, voices, feed token, inbound alias), `verified_senders`, `newsletters`, `inbound_messages`, `items`, `user_topics`, `episodes` (voice provider, characters, voice model, cost), `chapters`, `chapter_sources` → `items`, `heard_items` (with `cluster_key`), `listening_events` (hypertable), `usage_monthly`, `subscriptions`, `billing_events`, `promo_codes`, `promo_redemptions`, `step_runs`.
 
 ## Additions to the PRD
 - `users.onboarded_at/created_at/updated_at`; `newsletters.last_issue_at` (for "last issue" in the Sources list).
 - `inbound_messages`: `from_email`, `reject_reason`, and `confirmation_code`/`confirmation_url`, so the Gmail forwarding code can be shown in the app. `message_id` is unique, which makes webhook retries idempotent. `user_id` can be null for mail to an unknown alias (logged, then dropped).
 - `items`: `inbound_message_id`, `limited` (paywalled link), `published_at`.
 - `step_runs` with a unique `(episode_id, step, attempt)`, so activities can be idempotent.
+- **Voices:** the PRD's single `voice_id` is split into `kokoro_voice_id` (default `af_heart`) and `elevenlabs_voice_id`. When a promo trial ends and the user drops from ElevenLabs back to Kokoro, both choices are kept and nothing is lost (PRD §8.3). `episodes.voice_provider` records which provider made each episode.
+- **Plans:** `users.plan` is the *paid* plan, written only by Bachs webhooks. Features read the **effective plan** (paid Plus OR an unexpired promo trial OR Free), computed in one function (U5).
+- **Billing:** `subscriptions.status` is our own enum (`trialing/active/past_due/cancelled/expired`); the webhook maps Bachs statuses onto it. `billing_events.id` is the Bachs event id, so a replayed webhook changes nothing.
+- **Promo codes:** codes are unique case-insensitively, and a check constraint keeps `redeemed_count ≤ max_redemptions`, so concurrent redemptions can't over-redeem (the increment happens in the same transaction as the insert). Each user can redeem a code once.
 
 ## Constraints and defaults
 - One episode per user per local date; `episode_minutes ∈ {5,10,20}`; `weekly_day` 0–6; `delivery_time` matches `HH:mm`.

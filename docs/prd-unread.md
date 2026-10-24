@@ -11,7 +11,8 @@
 > **Claude Code:** build in the order of §13; stop at the cut line if time runs out. Verify every third-party API (Gemini API/Gemma, ElevenLabs, SerpApi, inbound email provider, Auth0, Temporal, Render, Tiger Data) against current docs and record choices in `docs/decisions/`. Code standards from `CLAUDE.md` apply.
 
 ## Changes from v1
-- Voice: **ElevenLabs only** (Kokoro removed). Premium users pick from the ElevenLabs voice library. Sound effects generated once and reused.
+- Voice: **Kokoro (open-weight, on our worker) for Free; ElevenLabs for Plus**, with the ElevenLabs voice library picker. Sound effects generated once with ElevenLabs and reused on every plan.
+- Payments: **Bachs** (subscriptions, hosted checkout, local currencies). **Promo codes** grant a time-limited Plus trial.
 - Model: **Gemma served by Google** (Gemini API, OpenAI-compatible endpoint); OpenRouter as fallback. No local-model mode in the product.
 - **Email forwarding is P0** and the centre of onboarding. News (SerpApi) is **opt-in**.
 - Plans (Free / Plus) and cost controls added, because voice is the main cost.
@@ -86,8 +87,9 @@ Postgres on Tiger Data (pgvector + a hypertable for listening events)
 apps/worker (Temporal worker on Render)
   collect → extract/clean → embed + cluster → plan → script → check → voice → cover → publish
         │                                  │                │
-   SerpApi (opt-in)          Gemma via Gemini API      ElevenLabs TTS
-                             (OpenRouter fallback)     (+ cached SFX)
+   SerpApi (opt-in)          Gemma via Gemini API      VoiceProvider: Kokoro (Free, CPU in worker)
+                             (OpenRouter fallback)                    ElevenLabs (Plus) + cached SFX
+Bachs (checkout, subscriptions, webhooks) ↔ /billing/* routes
 Object storage (S3-compatible) for MP3 and covers · Render: web service + background worker
 ```
 
@@ -105,7 +107,7 @@ Object storage (S3-compatible) for MP3 and covers · Render: web service + backg
 | 4 | `planEpisode` | Gemma ranks clusters: sender priority → user's listening signals (§7) → freshness. Fits the **character budget** for the user's plan and length (§8) |
 | 5 | `writeScript` | JSON per chapter: `{ title, lines: [{ text, sourceIds[] }] }`, intro naming the newsletters covered, outro. Merged stories say "covered by The X and The Y" |
 | 6 | `checkScript` | Every line cites ≥1 source; numbers and quotes must appear in the cited source text; lines ≤ 30 words; total characters ≤ budget. Failing lines regenerated once, then dropped |
-| 7 | `synthesizeVoice` | ElevenLabs TTS per chapter (model per plan, §8), with request stitching for continuity if supported (verify); cache by text + voice + model hash; ffmpeg concat with cached SFX (intro sting, chapter transitions); loudness −16 LUFS; chapter times from clip durations |
+| 7 | `synthesizeVoice` | `VoiceProvider` chosen by the user's **effective plan** (§8): Kokoro (`kokoro-js`, CPU) for Free, ElevenLabs for Plus/trial (request stitching for continuity if supported, verify). Per chapter; cache by text + voice + provider + model hash; ffmpeg concat with cached SFX (intro sting, chapter transitions); loudness −16 LUFS; chapter times from clip durations |
 | 8 | `renderCover` | Seeded SVG (user + date + top newsletters) → 3000×3000 and 1200×1200 PNG |
 | 9 | `publishEpisode` | Upload; write episode, chapters, sources, `heard_items`; mark items used; record characters and cost |
 
@@ -128,26 +130,49 @@ Object storage (S3-compatible) for MP3 and covers · Render: web service + backg
 | `heard_items` | user_id, item_id, cluster_key, episode_id |
 | `listening_events` | **Timescale hypertable** on `occurred_at`: user_id, episode_id, chapter_id, event (`play`/`skip`/`complete`/`seek`), position_s, client (`web`/`feed`) |
 | `usage_monthly` | user_id, month, characters_used, episodes_made |
+| `subscriptions` | id, user_id, bachs_customer_id, bachs_subscription_id, product_id, status, current_period_end, cancel_at_period_end, updated_at |
+| `billing_events` | id (Bachs event id, unique), type, payload jsonb, processed_at |
+| `promo_codes` / `promo_redemptions` | see §8.3 |
 
 **Tiger Data use:** Postgres for everything; **pgvector** for story clustering across newsletters and "already heard"; a **hypertable** for listening events, with a continuous aggregate (per user × newsletter/topic: skip rate, completion rate) that feeds `planEpisode` ranking. P2: hybrid keyword + vector search over past episodes.
 
-## 8. Voice, plans and cost
+## 8. Voice, plans, payments and cost
 
-ElevenLabs API list prices (verify before launch): Flash/Turbo ≈ $0.04 per 1K characters; Multilingual v2 / v3 ≈ $0.08 per 1K; sound effects ≈ $0.12 per generated minute. ~900 characters ≈ 1 minute of speech.
+ElevenLabs API list prices (verify before launch): Flash/Turbo ≈ $0.04 per 1K characters; Multilingual v2 / v3 ≈ $0.08 per 1K; sound effects ≈ $0.12 per generated minute. ~900 characters ≈ 1 minute of speech. Kokoro has no per-character cost (CPU time on our worker).
 
-| | Free | Plus (price TBD, e.g. $8–10/mo) |
+| | Free | Plus (price set in Bachs, e.g. $8–10/mo or local equivalent) |
 |---|---|---|
-| Cadence | Weekly digest | Daily (only when there's new content) |
+| Voice | **Kokoro**: 4 curated voices (e.g. `af_heart`, `af_bella` + two others chosen by listening tests) | **ElevenLabs**: Flash by default; "Studio voices" (Multilingual v2/v3) option; full voice library picker |
+| Cadence | Weekly digest (user picks the day) | Daily, only when there's new content |
 | Length | Up to 10 min | 5 / 10 / 20 min |
-| Voice model | Flash | Flash default; Multilingual v2/v3 "Studio voices" option |
-| Voices | 3 curated voices | Full ElevenLabs voice library picker |
-| Monthly character cap | ~40K | ~350K (enforced; the episode shortens to fit, never fails silently) |
+| Monthly cap | Episode count (4/month) | ~350K ElevenLabs characters (the episode shortens to fit, never fails silently) |
 | News opt-in | Yes | Yes |
 
-- Caps are enforced in `planEpisode` (budget) and checked again before `synthesizeVoice`.
-- SFX: a fixed set (intro sting, chapter transition, outro) generated once with the ElevenLabs sound effects API, stored as assets and reused for every episode.
-- Voice library: fetched from the ElevenLabs voices API, cached; preview clips played in the picker. **No voice cloning in v1.**
-- Every episode records characters and estimated cost; an admin page shows daily totals.
+### 8.1 Voice rules
+- `VoiceProvider` interface with `KokoroVoiceProvider` and `ElevenLabsVoiceProvider`; the pipeline asks for the provider by effective plan, never by checking plan flags inside voice code.
+- Kokoro runs in the Render worker. Measure speed on the chosen instance (CPU, often around real time or a bit faster); limit concurrent Kokoro jobs per worker; generate chapters in parallel within that limit. Free episodes are weekly, which keeps CPU load predictable.
+- The Free plan shows an "Upgrade to Studio voices" preview: a 10-second sample of the same intro in an ElevenLabs voice (generated once per voice and cached).
+- SFX: a fixed set (intro sting, chapter transition, outro) generated once with the ElevenLabs sound effects API and reused on every plan.
+- **No voice cloning in v1.**
+- Every episode records provider, characters and estimated cost; an admin page shows daily totals.
+- Kokoro is Apache-2.0. Its phonemizer is likely espeak-ng based (GPL); running it on our server is not distribution, but confirm the licence before ever shipping it inside a downloadable app.
+
+### 8.2 Payments (Bachs)
+- Bachs, "the payments stack for African internet businesses": hosted checkout, subscriptions with trials, customer portal, webhooks, payment in the customer's local currency (examples show USD and NGN). Base URLs: `https://sandbox-api.bachs.io` (keys `sk_sandbox_…`) and `https://api.bachs.io` (`sk_live_…`); docs at docs.bachs.io. **Verify every endpoint and field name against the docs before coding.**
+- Setup: one recurring product per Plus price (monthly; annual optional). Store product ids in config, not code.
+- Upgrade flow: `POST /billing/checkout` creates a Bachs customer if needed, then a hosted checkout session for the Plus product → redirect → Bachs redirects back to `/billing/return`. **Plan changes only from webhooks**, never from the return URL.
+- Webhooks: `POST /billing/webhooks/bachs`, signature verified (HMAC-SHA256 header, reject stale timestamps), idempotent by event id. Handle subscription created / updated / cancelled and payment failed. Map Bachs status → our `subscriptions.status`.
+- Manage plan: a Bachs customer-portal session from Settings ("Manage billing"), for card updates and cancellation.
+- Cancelled subscriptions stay Plus until the end of the paid period, then drop to Free.
+
+### 8.3 Promo codes (Plus trial)
+- Our own feature, independent of Bachs: a code grants **Plus for N days with no card**.
+- `promo_codes`: code (case-insensitive, unique), trial_days, max_redemptions, redeemed_count, expires_at, active, note. `promo_redemptions`: code_id, user_id, redeemed_at, trial_ends_at (unique per code + user).
+- Rules: one active trial per user; a user can't redeem a code while already on paid Plus; codes are rate-limited and validated server-side; redemption is atomic (no over-redeeming under concurrency).
+- **Effective plan** = paid Plus (from Bachs) OR an unexpired promo trial OR Free. Computed in one function used everywhere.
+- Trial end: email 3 days before and on the day ("Your Studio voice ends on…" + upgrade link); then back to Kokoro automatically, nothing lost.
+- Admin: create, deactivate and view redemptions of codes (a simple protected page or CLI).
+- Optional later: use Bachs's own product trials for card-required trials.
 
 ## 9. UI (web, responsive)
 
@@ -177,14 +202,17 @@ Global player component with Media Session metadata and desktop shortcuts (space
 - Inbound: webhook signatures, verified-sender allow-list, SPF/DKIM verdicts, size limits, attachments ignored, HTML sanitised before storage. Raw emails kept 30 days then deleted.
 - Feed and audio: unguessable tokens; rotate on demand.
 - SSRF protection on link fetching.
-- **Privacy policy** states plainly: newsletter text is processed by Google (Gemma via Gemini API) and voice text by ElevenLabs; neither is used to train our models; delete account removes everything. Check both providers' data terms (paid tiers if needed so data isn't used for training).
+- **Privacy policy** states plainly what each provider receives:
+  - **Google (Gemma via Gemini API):** the cleaned newsletter and article text, for summarising and scripting.
+  - **ElevenLabs:** only the finished episode script (Gemma's summaries, newsletter names and any short quotes kept in the script), never the raw newsletters.
+  - Delete account removes everything we store. Check both providers' data terms (use paid tiers if needed so data isn't used for training).
 
 ## 11. Partner technology (Hackathon)
 
 | Category | Use |
 |---|---|
 | **Gemma** (featured) | All curation, clustering confirmation, summarising and scripting; EmbeddingGemma if used |
-| **ElevenLabs** | Every episode's voice; voice library picker; generated SFX set |
+| **ElevenLabs** | Plus and trial voices; voice library picker; generated SFX set used on every plan |
 | **Render** (featured) | Web service + background worker |
 | **Tiger Data** | Postgres + pgvector (story clustering, heard-items) + hypertable for listening events |
 | **SerpApi** | Opt-in news per topic and edition |
@@ -192,7 +220,7 @@ Global player component with Media Session metadata and desktop shortcuts (space
 | **Auth0 for AI Agents** | Sign-in; Token Vault Gmail import if built |
 | **Sentry Agent Tracing** | Optional: traces per step and model call |
 
-**Why open (for the post):** Gemma's open weights are what make the core affordable and portable: today it's served by Google; at scale the same prompts and schemas run on self-hosted Gemma with no rewrite and no per-token lock-in. The voice is the paid part; the brain is open.
+**Why open (for the post):** open models are what make a free plan possible at all. Gemma does all the thinking (served by Google today, portable to self-hosted Gemma with no rewrite), and Kokoro voices every free episode on our own worker at no per-character cost. ElevenLabs is the paid upgrade, not the foundation.
 
 ## 12. Non-functional
 
@@ -210,10 +238,10 @@ Global player component with Media Session metadata and desktop shortcuts (space
 | U2 | Pipeline 3–6 (cluster, plan, script, check) as functions + CLI | Script JSON with merged, cited chapters from 3+ newsletters | Sat evening |
 | U3 | ElevenLabs voice + SFX + cover + publish + feed | MP3 plays in a podcast app via the private feed | Sat night |
 | U4 | UI: onboarding (forwarding first), Home, Now playing, Sources, Settings, responsive, global player | Canvas screens + desktop layout work end to end | Sun midday |
-| U5 | Links + opt-in news (SerpApi); plans and caps; Temporal schedule; Render deploy; domain | Scheduled episode appears; free cap enforced | Sun evening |
+| U5 | Links + opt-in news (SerpApi); effective plan, promo codes, Bachs checkout + webhooks (sandbox); Temporal schedule; Render deploy; domain | Promo code switches a user to ElevenLabs; sandbox checkout upgrades via webhook; scheduled episode appears | Sun evening |
 | U6 | Submission: demo video, screenshots, Lazy Payoff numbers, write-up | Post published | Mon before 07:00 |
 
-**Cut line, in order:** Gmail Token Vault → RSS → listening-event ranking (keep the hypertable logging) → Temporal (Render cron calling the same functions) → voice library picker (keep 3 voices) → billing UI (keep plan flag + caps). **Never cut:** forwarding, cross-newsletter dedupe, citations, the script check, the private feed.
+**Cut line, in order:** Gmail Token Vault → RSS → listening-event ranking (keep the hypertable logging) → Temporal (Render cron calling the same functions) → voice library picker (keep 3 ElevenLabs voices) → Bachs checkout (keep promo-code trials + plan flag + caps; Bachs ships right after the hackathon). **Never cut:** forwarding, cross-newsletter dedupe, citations, the script check, the private feed.
 
 ## 14. Acceptance
 
@@ -223,3 +251,5 @@ Global player component with Media Session metadata and desktop shortcuts (space
 - Free users are capped at their weekly episode and character limit; the episode shortens rather than failing.
 - The episode plays in a podcast app with cover and chapters, and in the web player on phone (390 px) and desktop (1440 px).
 - Mail from an unverified sender is rejected and never reaches a model.
+- Free episodes use Kokoro; redeeming a valid promo code switches the next episode to ElevenLabs until the trial ends, then back to Kokoro automatically.
+- A Bachs sandbox payment upgrades the user only after the signed webhook arrives; a replayed webhook changes nothing.
