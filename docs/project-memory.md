@@ -11,7 +11,7 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 | U0 repo, Next.js, schema, Auth0, tokens | Done. Auth0 tenant not created yet (login untested against a real tenant). |
 | U1 inbound email | Done in code + tests. Cloudflare Email Routing/Worker not deployed. |
 | U2 cluster → plan → script → check, `pnpm brief` | Done. **Never run against real Gemma** (no `GEMINI_API_KEY`/`OPENROUTER_API_KEY` yet); tests use a scripted fake model. |
-| U3 voice, cover, publish, feed | Done. Kokoro verified end to end; ElevenLabs code done, key verified by `onboard check`; **no speech generated yet** (user hasn't said yes to the test); SFX not generated (`pnpm generate-assets`). |
+| U3 voice, cover, publish, feed | Done. Kokoro verified end to end; ElevenLabs code done; key verified and the CLI test request succeeded (user approved, 2026-10-24); SFX not generated yet (`pnpm generate-assets`, ask first: it spends credits). |
 | U4 UI | Done; screenshots in `docs/screenshots/u4`. |
 | U5 links, news, plans, promos, Bachs, Temporal, deploy config | Done in code; no provider accounts/deploy yet. |
 | U6 submission (video, write-up) | User's. |
@@ -31,7 +31,7 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 - 0009 SerpApi news (36 h window), SSRF-safe Readability, S3/R2 storage, Resend mail.
 
 ## Environment facts (this cloud sandbox)
-- **Outbound is HTTPS-only via a proxy.** Raw-TCP databases are unreachable: Tiger Data (`PG_URL`, port 31116) can't be reached from here until the environment's Network access is broadened. Don't mock around it.
+- **Outbound is HTTPS-only via a proxy.** Raw-TCP databases are unreachable: Tiger Data (`PG_URL`, port 31116) times out even after the user switched the environment to full network access (the running container kept the old policy; retest in a fresh session). If still blocked, migrate from Render (`preDeployCommand: pnpm db:migrate`) or the user's machine. Don't mock around it.
 - `PG_URL` = Tiger Data (preferred by `loadConfig` and drizzle config). `DATABASE_URL` in this env points at an unrelated TiDB Cloud host; it's only a fallback.
 - `ELEVENLABS_API_KEY` is set as an env secret (key ends a478). ElevenLabs CLI rules: never print/cat env files, never put the key in code, don't make speech to "try it" until the user says yes (`npx -y @elevenlabs/cli@latest onboard test --env-path .env.local` is the test command).
 - Also present but **not to be used without asking**: `CLOUDFLARE_API_TOKEN`, AWS keys, `RESEND_API_KEY`.
@@ -49,7 +49,7 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 ## Open items / next steps
 1. User to broaden Network access → then inspect Tiger DB (confirm empty), `PG_URL=… pnpm db:migrate`, check the hypertable got created.
 2. Gemma key (`GEMINI_API_KEY` and/or `OPENROUTER_API_KEY`) → run `pnpm brief --user <id>` on real newsletters; tune prompts if the check drops many lines; try `GEMINI_API_STYLE=openai`.
-3. After user says yes: ElevenLabs test request, then `pnpm generate-assets` for the SFX.
+3. `pnpm generate-assets` for the SFX (ask before spending credits).
 4. Accounts + deploy (docs/deploy.md): Auth0 app, Cloudflare Email Routing + `wrangler deploy`, R2 bucket, Render blueprint, Temporal Cloud (optional), Bachs sandbox products + webhook, SerpApi, Resend domain.
 5. Measure Kokoro speed on the Render instance; tune `KOKORO_CONCURRENCY`.
 6. Landing page `/` is minimal (hero, two CTAs, privacy link); a fuller marketing page is not built.
