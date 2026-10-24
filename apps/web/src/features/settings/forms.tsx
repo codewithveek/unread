@@ -64,7 +64,7 @@ export function DeleteAccountForm() {
   return (
     <form action={action} className="flex flex-col gap-2">
       <p className="m-0 text-sm text-muted-foreground">
-        Deletes your episodes, audio, covers, newsletters, links and settings. This can't be undone.
+        Deletes your episodes, audio, covers, newsletters, links and settings. This can&apos;t be undone.
       </p>
       <div className="flex gap-2">
         <label className="flex h-11 min-w-0 flex-1 items-center rounded-xl border border-line bg-ground px-3">

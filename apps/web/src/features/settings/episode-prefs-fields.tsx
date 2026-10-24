@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useBrowserValue } from "@/lib/use-browser-value";
 import { cn } from "@/lib/utils";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -16,17 +17,8 @@ export interface EpisodePrefsFieldsProps {
 export function EpisodePrefsFields({ isPlus, initial, detectTimezone = false }: EpisodePrefsFieldsProps) {
   const [minutes, setMinutes] = useState(initial.episodeMinutes);
   const [cadence, setCadence] = useState(isPlus ? initial.cadence : "weekly");
-  const [timezone, setTimezone] = useState(initial.timezone);
-
-  useEffect(() => {
-    if (detectTimezone) {
-      try {
-        setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone || initial.timezone);
-      } catch {
-        // keep the stored one
-      }
-    }
-  }, [detectTimezone, initial.timezone]);
+  const browserTimezone = useBrowserValue(() => Intl.DateTimeFormat().resolvedOptions().timeZone || initial.timezone, initial.timezone);
+  const timezone = detectTimezone ? browserTimezone : initial.timezone;
 
   const option = (on: boolean, disabled = false) =>
     cn(
@@ -84,7 +76,7 @@ export function EpisodePrefsFields({ isPlus, initial, detectTimezone = false }: 
           <input type="time" name="deliveryTime" defaultValue={initial.deliveryTime} required className="h-12 rounded-xl border border-line bg-surface px-3 text-[15px] text-foreground [color-scheme:dark]" />
         </label>
       </div>
-      <p className="m-0 text-[13px] text-muted-foreground">Times are in {timezone.replace(/_/g, " ")}. Episodes are only made when there's something new.</p>
+      <p className="m-0 text-[13px] text-muted-foreground">Times are in {timezone.replace(/_/g, " ")}. Episodes are only made when there&apos;s something new.</p>
     </div>
   );
 }

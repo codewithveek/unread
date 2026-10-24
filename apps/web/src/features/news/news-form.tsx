@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { initialActionState } from "@/features/action-state";
+import { useBrowserValue } from "@/lib/use-browser-value";
 import { cn } from "@/lib/utils";
 import { saveNewsAction } from "./actions";
 import { NEWS_EDITIONS, SUGGESTED_TOPICS } from "./topics";
@@ -39,16 +40,12 @@ export function NewsForm({ initial, submitLabel, nextHref, hasNewsletters }: New
   const [optIn, setOptIn] = useState(initial.optIn);
   const [topics, setTopics] = useState<string[]>(initial.topics);
   const [query, setQuery] = useState("");
-  const [edition, setEdition] = useState(
-    initial.country ? `${initial.country}:${initial.language ?? "en"}` : "",
-  );
-
-  useEffect(() => {
-    if (!edition) {
-      const d = detectEdition();
-      setEdition(`${d.country}:${d.language}`);
-    }
-  }, [edition]);
+  const detected = useBrowserValue(() => {
+    const d = detectEdition();
+    return `${d.country}:${d.language}`;
+  }, "US:en");
+  const [chosenEdition, setEdition] = useState(initial.country ? `${initial.country}:${initial.language ?? "en"}` : "");
+  const edition = chosenEdition || detected;
 
   useEffect(() => {
     if (state.ok && nextHref) router.push(nextHref as Parameters<typeof router.push>[0]);

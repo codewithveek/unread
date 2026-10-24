@@ -49,7 +49,7 @@ export function LiveStatus({ initial }: { initial: Status["inbound"] }) {
           ) : null}
           {status.confirmation.url ? (
             <a href={status.confirmation.url} target="_blank" rel="noopener noreferrer" className="text-sm">
-              Or open Gmail's confirm link
+              Or open Gmail&apos;s confirm link
             </a>
           ) : null}
         </div>
