@@ -1,6 +1,6 @@
 import "server-only";
 import { schema } from "@unread/db";
-import type { EpisodeTranscript } from "@unread/core/episodes";
+import type { EpisodeTranscript } from "@unread/core/episodes/transcript";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 

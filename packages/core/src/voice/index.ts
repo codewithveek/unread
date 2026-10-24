@@ -6,6 +6,7 @@ import { type VoiceProvider, VoiceNotConfiguredError } from "./voice-provider";
 export * from "./cache";
 export * from "./kokoro";
 export * from "./voice-provider";
+export * from "./voices";
 
 /** Provider for the user's effective plan (prd §8.1). */
 export function voiceProviderFor(id: VoiceProviderId, config: CoreConfig): VoiceProvider {

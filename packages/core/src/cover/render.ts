@@ -1,10 +1,13 @@
 import { fileURLToPath } from "node:url";
 import { Resvg } from "@resvg/resvg-js";
 
-const FONT_FILES = [
-  fileURLToPath(new URL("../../assets/fonts/Geist-Bold.ttf", import.meta.url)),
-  fileURLToPath(new URL("../../assets/fonts/GeistMono-Regular.ttf", import.meta.url)),
-];
+/** Resolved lazily: this module is only ever used by the worker. */
+function fontFiles(): string[] {
+  return [
+    fileURLToPath(new URL("../../assets/fonts/Geist-Bold.ttf", import.meta.url)),
+    fileURLToPath(new URL("../../assets/fonts/GeistMono-Regular.ttf", import.meta.url)),
+  ];
+}
 
 const GROUND = "#0E0F12";
 const SURFACE = "#1F2128";
@@ -71,7 +74,7 @@ export function coverSvg(input: CoverInput): string {
 export function renderCoverPng(svg: string, size: number): Uint8Array {
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: size },
-    font: { fontFiles: FONT_FILES, loadSystemFonts: false, defaultFontFamily: "Geist" },
+    font: { fontFiles: fontFiles(), loadSystemFonts: false, defaultFontFamily: "Geist" },
   });
   return new Uint8Array(resvg.render().asPng());
 }

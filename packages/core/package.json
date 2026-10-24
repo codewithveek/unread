@@ -47,6 +47,10 @@
     "./cover": "./src/cover/index.ts",
     "./feed": "./src/feed/index.ts",
     "./promo": "./src/promo/index.ts",
-    "./mail": "./src/mail/index.ts"
+    "./mail": "./src/mail/index.ts",
+    "./util/rate-limit": "./src/util/rate-limit.ts",
+    "./voice/voices": "./src/voice/voices.ts",
+    "./episodes/requests": "./src/episodes/requests.ts",
+    "./episodes/transcript": "./src/episodes/transcript.ts"
   }
 }

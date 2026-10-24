@@ -70,3 +70,11 @@ export const requireUser = cache(async (returnTo: string = "/today"): Promise<Cu
   const user = await findOrCreateUser(sessionUser);
   return { user, sessionUser };
 });
+
+/** For route handlers: the signed-in user or null (no redirect). */
+export async function currentUser(): Promise<CurrentUser | null> {
+  const session = await auth0.getSession();
+  if (!session) return null;
+  const sessionUser = sessionUserSchema.parse(session.user);
+  return { user: await findOrCreateUser(sessionUser), sessionUser };
+}

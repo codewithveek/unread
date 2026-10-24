@@ -16,6 +16,7 @@
   --text: #f2f3f5;
   --text-2: #d6d9df;
   --muted-text: #a3a8b3;
+  --dim-text: #8a909c;
   --brand: #5b9bff;
   --on-brand: #0a1a33;
   --link: #8fb8ff;
@@ -53,6 +54,7 @@
   --color-line: var(--line);
   --color-text: var(--text);
   --color-text-2: var(--text-2);
+  --color-dim: var(--dim-text);
   --color-brand: var(--brand);
   --color-on-brand: var(--on-brand);
   --color-link: var(--link);
