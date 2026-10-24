@@ -1,0 +1,20 @@
+Return-Path: <lucky@example.com>
+Authentication-Results: mx.cloudflare.net; dkim=pass header.d=tldrnewsletter.com; spf=pass smtp.mailfrom=lucky@example.com
+X-Forwarded-For: lucky@example.com e5aksq66ta@in.getunread.site
+From: TLDR <dan@tldrnewsletter.com>
+To: lucky@example.com
+Subject: TLDR 2026-10-24
+Message-ID: <tldr-2026-10-24@tldrnewsletter.com>
+Date: Sat, 24 Oct 2026 05:00:00 +0000
+Content-Type: text/html; charset="UTF-8"
+
+<html><body>
+<h1>Big Tech &amp; Startups</h1>
+<h3>OpenAI launches cheaper reasoning model (4 minute read)</h3>
+<p>OpenAI on Tuesday launched a reasoning model that costs $2 per million input tokens, about 60% less than the model it replaces. It is live in the API today and comes to ChatGPT next week, according to the company.</p>
+<h3>Rust in the Linux kernel passes a milestone (6 minute read)</h3>
+<p>The Linux kernel now ships more than 100 Rust drivers. Maintainers say memory-safety bugs in those drivers have dropped sharply, and two major distributions will enable the Rust toolchain by default next year.</p>
+<h3>Sponsor: DataCo</h3>
+<p>Try DataCo free for 30 days. Sponsored.</p>
+<p>Want to advertise in TLDR? Unsubscribe here. Copyright TLDR 2026.</p>
+</body></html>

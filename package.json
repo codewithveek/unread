@@ -12,6 +12,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "db:generate": "pnpm --filter @unread/db generate",
-    "db:migrate": "pnpm --filter @unread/db migrate"
+    "db:migrate": "pnpm --filter @unread/db migrate",
+    "brief": "pnpm --filter @unread/worker brief"
   }
 }

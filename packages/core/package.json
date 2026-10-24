@@ -35,6 +35,11 @@
     "./storage": "./src/storage/index.ts",
     "./inbound": "./src/inbound/index.ts",
     "./inbound/signature": "./src/inbound/signature.ts",
-    "./links": "./src/links/index.ts"
+    "./links": "./src/links/index.ts",
+    "./model": "./src/model/index.ts",
+    "./embeddings": "./src/embeddings/index.ts",
+    "./plans": "./src/plans/index.ts",
+    "./pipeline": "./src/pipeline/index.ts",
+    "./util/dates": "./src/util/dates.ts"
   }
 }
