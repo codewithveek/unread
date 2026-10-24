@@ -1,6 +1,6 @@
 # Unread
 
-Every morning, Unread turns the latest stories on your topics, plus the links and newsletters you saved, into one short podcast episode, delivered to the app you already use.
+Forward your newsletters to Unread and get one short, deduplicated podcast episode with the parts that matter, in a voice you choose, delivered to the podcast app you already use.
 
 - Product spec: [docs/prd-unread.md](docs/prd-unread.md)
 - Design reference: [docs/design/](docs/design/README.md)
@@ -11,11 +11,11 @@ Every morning, Unread turns the latest stories on your topics, plus the links an
 | Milestone | State |
 |---|---|
 | U0 · Repo, Next.js, Drizzle schema, Auth0 sign-in, design tokens | Done |
-| U1 · Pipeline steps 1–6 + `pnpm brief` CLI | Next |
+| U1 · Inbound email (Cloudflare Email Routing), verified senders, cleaning, Gmail confirmation | Next |
 
 ## Run locally
 
-Requires Node 22 and pnpm 10, plus Postgres 16 with pgvector (Tiger Data in production).
+Requires Node 22 and pnpm 10, plus Postgres 16 with pgvector (Tiger Data in production, which adds TimescaleDB).
 
 ```sh
 pnpm install

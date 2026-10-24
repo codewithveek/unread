@@ -1,115 +1,9 @@
 {
-  "id": "d3dd0958-a710-4973-b12c-c41e1fd68e56",
-  "prevId": "32917535-0f7b-4af3-9abc-aa67c9e4e54b",
+  "id": "c007cf30-0f19-4279-92f7-4d61dea8fc6f",
+  "prevId": "4bf56eaa-44a0-4860-ab22-bf5ce8296cb8",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.articles": {
-      "name": "articles",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "canonical_url": {
-          "name": "canonical_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "outlet": {
-          "name": "outlet",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "published_at": {
-          "name": "published_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "text_excerpt": {
-          "name": "text_excerpt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "text_hash": {
-          "name": "text_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "embedding": {
-          "name": "embedding",
-          "type": "vector(768)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "fetched_at": {
-          "name": "fetched_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "articles_url_key": {
-          "name": "articles_url_key",
-          "columns": [
-            {
-              "expression": "url",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "articles_embedding_idx": {
-          "name": "articles_embedding_idx",
-          "columns": [
-            {
-              "expression": "embedding",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last",
-              "opclass": "vector_cosine_ops"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "hnsw",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.chapter_sources": {
       "name": "chapter_sources",
       "schema": "",
@@ -120,8 +14,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "article_id": {
-          "name": "article_id",
+        "item_id": {
+          "name": "item_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -150,12 +44,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "chapter_sources_article_id_articles_id_fk": {
-          "name": "chapter_sources_article_id_articles_id_fk",
+        "chapter_sources_item_id_items_id_fk": {
+          "name": "chapter_sources_item_id_items_id_fk",
           "tableFrom": "chapter_sources",
-          "tableTo": "articles",
+          "tableTo": "items",
           "columnsFrom": [
-            "article_id"
+            "item_id"
           ],
           "columnsTo": [
             "id"
@@ -165,11 +59,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "chapter_sources_chapter_id_article_id_pk": {
-          "name": "chapter_sources_chapter_id_article_id_pk",
+        "chapter_sources_chapter_id_item_id_pk": {
+          "name": "chapter_sources_chapter_id_item_id_pk",
           "columns": [
             "chapter_id",
-            "article_id"
+            "item_id"
           ]
         }
       },
@@ -317,6 +211,24 @@
           "primaryKey": false,
           "notNull": false
         },
+        "characters": {
+          "name": "characters",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "voice_model": {
+          "name": "voice_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cost_cents": {
+          "name": "cost_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "audio_key": {
           "name": "audio_key",
           "type": "text",
@@ -393,8 +305,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.heard_articles": {
-      "name": "heard_articles",
+    "public.heard_items": {
+      "name": "heard_items",
       "schema": "",
       "columns": {
         "user_id": {
@@ -403,8 +315,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "article_id": {
-          "name": "article_id",
+        "item_id": {
+          "name": "item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cluster_key": {
+          "name": "cluster_key",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -423,11 +341,33 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "heard_items_user_cluster_idx": {
+          "name": "heard_items_user_cluster_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "cluster_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "heard_articles_user_id_users_id_fk": {
-          "name": "heard_articles_user_id_users_id_fk",
-          "tableFrom": "heard_articles",
+        "heard_items_user_id_users_id_fk": {
+          "name": "heard_items_user_id_users_id_fk",
+          "tableFrom": "heard_items",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -438,12 +378,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "heard_articles_article_id_articles_id_fk": {
-          "name": "heard_articles_article_id_articles_id_fk",
-          "tableFrom": "heard_articles",
-          "tableTo": "articles",
+        "heard_items_item_id_items_id_fk": {
+          "name": "heard_items_item_id_items_id_fk",
+          "tableFrom": "heard_items",
+          "tableTo": "items",
           "columnsFrom": [
-            "article_id"
+            "item_id"
           ],
           "columnsTo": [
             "id"
@@ -451,9 +391,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "heard_articles_episode_id_episodes_id_fk": {
-          "name": "heard_articles_episode_id_episodes_id_fk",
-          "tableFrom": "heard_articles",
+        "heard_items_episode_id_episodes_id_fk": {
+          "name": "heard_items_episode_id_episodes_id_fk",
+          "tableFrom": "heard_items",
           "tableTo": "episodes",
           "columnsFrom": [
             "episode_id"
@@ -466,11 +406,11 @@
         }
       },
       "compositePrimaryKeys": {
-        "heard_articles_user_id_article_id_pk": {
-          "name": "heard_articles_user_id_article_id_pk",
+        "heard_items_user_id_item_id_pk": {
+          "name": "heard_items_user_id_item_id_pk",
           "columns": [
             "user_id",
-            "article_id"
+            "item_id"
           ]
         }
       },
@@ -479,8 +419,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.rss_feeds": {
-      "name": "rss_feeds",
+    "public.inbound_messages": {
+      "name": "inbound_messages",
       "schema": "",
       "columns": {
         "id": {
@@ -493,46 +433,85 @@
           "name": "user_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "title": {
-          "name": "title",
+        "newsletter_id": {
+          "name": "newsletter_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "last_fetched_at": {
-          "name": "last_fetched_at",
-          "type": "timestamp with time zone",
+        "message_id": {
+          "name": "message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_email": {
+          "name": "from_email",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "received_at": {
+          "name": "received_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "subject": {
+          "name": "subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_key": {
+          "name": "raw_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "inbound_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'received'"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "inbound_kind",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "confirmation_code": {
+          "name": "confirmation_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confirmation_url": {
+          "name": "confirmation_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reject_reason": {
+          "name": "reject_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
-        "rss_feeds_user_url_key": {
-          "name": "rss_feeds_user_url_key",
+        "inbound_messages_message_id_key": {
+          "name": "inbound_messages_message_id_key",
           "columns": [
             {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "url",
+              "expression": "message_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -542,12 +521,33 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "inbound_messages_user_received_idx": {
+          "name": "inbound_messages_user_received_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "received_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "rss_feeds_user_id_users_id_fk": {
-          "name": "rss_feeds_user_id_users_id_fk",
-          "tableFrom": "rss_feeds",
+        "inbound_messages_user_id_users_id_fk": {
+          "name": "inbound_messages_user_id_users_id_fk",
+          "tableFrom": "inbound_messages",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -557,6 +557,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "inbound_messages_newsletter_id_newsletters_id_fk": {
+          "name": "inbound_messages_newsletter_id_newsletters_id_fk",
+          "tableFrom": "inbound_messages",
+          "tableTo": "newsletters",
+          "columnsFrom": [
+            "newsletter_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -565,8 +578,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.saved_items": {
-      "name": "saved_items",
+    "public.items": {
+      "name": "items",
       "schema": "",
       "columns": {
         "id": {
@@ -581,12 +594,24 @@
           "primaryKey": false,
           "notNull": true
         },
-        "kind": {
-          "name": "kind",
-          "type": "saved_item_kind",
+        "source_kind": {
+          "name": "source_kind",
+          "type": "item_source_kind",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "newsletter_id": {
+          "name": "newsletter_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "inbound_message_id": {
+          "name": "inbound_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "url": {
           "name": "url",
@@ -598,17 +623,42 @@
           "name": "title",
           "type": "text",
           "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
           "notNull": false
         },
-        "raw_ref": {
-          "name": "raw_ref",
+        "text_hash": {
+          "name": "text_hash",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "limited": {
+          "name": "limited",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "embedding": {
+          "name": "embedding",
+          "type": "vector(768)",
           "primaryKey": false,
           "notNull": false
         },
         "status": {
           "name": "status",
-          "type": "saved_item_status",
+          "type": "item_status",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -623,8 +673,8 @@
         }
       },
       "indexes": {
-        "saved_items_user_status_idx": {
-          "name": "saved_items_user_status_idx",
+        "items_user_status_idx": {
+          "name": "items_user_status_idx",
           "columns": [
             {
               "expression": "user_id",
@@ -643,12 +693,262 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "items_user_text_hash_idx": {
+          "name": "items_user_text_hash_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "text_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "items_embedding_idx": {
+          "name": "items_embedding_idx",
+          "columns": [
+            {
+              "expression": "embedding",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "vector_cosine_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "hnsw",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "saved_items_user_id_users_id_fk": {
-          "name": "saved_items_user_id_users_id_fk",
-          "tableFrom": "saved_items",
+        "items_user_id_users_id_fk": {
+          "name": "items_user_id_users_id_fk",
+          "tableFrom": "items",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "items_newsletter_id_newsletters_id_fk": {
+          "name": "items_newsletter_id_newsletters_id_fk",
+          "tableFrom": "items",
+          "tableTo": "newsletters",
+          "columnsFrom": [
+            "newsletter_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "items_inbound_message_id_inbound_messages_id_fk": {
+          "name": "items_inbound_message_id_inbound_messages_id_fk",
+          "tableFrom": "items",
+          "tableTo": "inbound_messages",
+          "columnsFrom": [
+            "inbound_message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.listening_events": {
+      "name": "listening_events",
+      "schema": "",
+      "columns": {
+        "occurred_at": {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "episode_id": {
+          "name": "episode_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chapter_id": {
+          "name": "chapter_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "event": {
+          "name": "event",
+          "type": "listening_event",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position_s": {
+          "name": "position_s",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "client": {
+          "name": "client",
+          "type": "listening_client",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "listening_events_user_time_idx": {
+          "name": "listening_events_user_time_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "occurred_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.newsletters": {
+      "name": "newsletters",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sender_email": {
+          "name": "sender_email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "list_id": {
+          "name": "list_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "enabled": {
+          "name": "enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "priority": {
+          "name": "priority",
+          "type": "newsletter_priority",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'normal'"
+        },
+        "last_issue_at": {
+          "name": "last_issue_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "newsletters_user_sender_key": {
+          "name": "newsletters_user_sender_key",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lower(\"sender_email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "newsletters_user_id_users_id_fk": {
+          "name": "newsletters_user_id_users_id_fk",
+          "tableFrom": "newsletters",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -767,6 +1067,67 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.usage_monthly": {
+      "name": "usage_monthly",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "month": {
+          "name": "month",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "characters_used": {
+          "name": "characters_used",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "episodes_made": {
+          "name": "episodes_made",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usage_monthly_user_id_users_id_fk": {
+          "name": "usage_monthly_user_id_users_id_fk",
+          "tableFrom": "usage_monthly",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "usage_monthly_user_id_month_pk": {
+          "name": "usage_monthly_user_id_month_pk",
+          "columns": [
+            "user_id",
+            "month"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.user_topics": {
       "name": "user_topics",
       "schema": "",
@@ -876,19 +1237,13 @@
           "primaryKey": false,
           "notNull": false
         },
-        "country": {
-          "name": "country",
-          "type": "text",
+        "plan": {
+          "name": "plan",
+          "type": "plan",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'US'"
-        },
-        "language": {
-          "name": "language",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'en'"
+          "default": "'free'"
         },
         "timezone": {
           "name": "timezone",
@@ -904,19 +1259,60 @@
           "notNull": true,
           "default": "'07:00'"
         },
+        "cadence": {
+          "name": "cadence",
+          "type": "cadence",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'weekly'"
+        },
+        "weekly_day": {
+          "name": "weekly_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
         "episode_minutes": {
           "name": "episode_minutes",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
-          "default": 15
+          "default": 10
         },
         "voice_id": {
           "name": "voice_id",
           "type": "text",
           "primaryKey": false,
+          "notNull": false
+        },
+        "news_opt_in": {
+          "name": "news_opt_in",
+          "type": "boolean",
+          "primaryKey": false,
           "notNull": true,
-          "default": "'af_heart'"
+          "default": false
+        },
+        "news_mode": {
+          "name": "news_mode",
+          "type": "news_mode",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'fill'"
+        },
+        "news_country": {
+          "name": "news_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "news_language": {
+          "name": "news_language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "feed_token": {
           "name": "feed_token",
@@ -1005,7 +1401,11 @@
       "checkConstraints": {
         "users_episode_minutes_check": {
           "name": "users_episode_minutes_check",
-          "value": "\"users\".\"episode_minutes\" in (5, 15, 30)"
+          "value": "\"users\".\"episode_minutes\" in (5, 10, 20)"
+        },
+        "users_weekly_day_check": {
+          "name": "users_weekly_day_check",
+          "value": "\"users\".\"weekly_day\" between 0 and 6"
         },
         "users_delivery_time_check": {
           "name": "users_delivery_time_check",
@@ -1013,9 +1413,97 @@
         }
       },
       "isRLSEnabled": false
+    },
+    "public.verified_senders": {
+      "name": "verified_senders",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verified_at": {
+          "name": "verified_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "verified_senders_user_email_key": {
+          "name": "verified_senders_user_email_key",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lower(\"email\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "verified_senders_user_id_users_id_fk": {
+          "name": "verified_senders_user_id_users_id_fk",
+          "tableFrom": "verified_senders",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {
+    "public.cadence": {
+      "name": "cadence",
+      "schema": "public",
+      "values": [
+        "daily",
+        "weekly"
+      ]
+    },
     "public.chapter_source_role": {
       "name": "chapter_source_role",
       "schema": "public",
@@ -1034,13 +1522,87 @@
         "failed"
       ]
     },
+    "public.inbound_kind": {
+      "name": "inbound_kind",
+      "schema": "public",
+      "values": [
+        "issue",
+        "link",
+        "forwarding_confirmation",
+        "rejected"
+      ]
+    },
+    "public.inbound_status": {
+      "name": "inbound_status",
+      "schema": "public",
+      "values": [
+        "received",
+        "processed",
+        "rejected",
+        "failed"
+      ]
+    },
+    "public.item_source_kind": {
+      "name": "item_source_kind",
+      "schema": "public",
+      "values": [
+        "newsletter",
+        "link",
+        "news",
+        "rss"
+      ]
+    },
+    "public.item_status": {
+      "name": "item_status",
+      "schema": "public",
+      "values": [
+        "queued",
+        "used",
+        "skipped"
+      ]
+    },
+    "public.listening_client": {
+      "name": "listening_client",
+      "schema": "public",
+      "values": [
+        "web",
+        "feed"
+      ]
+    },
+    "public.listening_event": {
+      "name": "listening_event",
+      "schema": "public",
+      "values": [
+        "play",
+        "skip",
+        "complete",
+        "seek"
+      ]
+    },
+    "public.news_mode": {
+      "name": "news_mode",
+      "schema": "public",
+      "values": [
+        "always",
+        "fill"
+      ]
+    },
+    "public.newsletter_priority": {
+      "name": "newsletter_priority",
+      "schema": "public",
+      "values": [
+        "always",
+        "normal",
+        "if_room"
+      ]
+    },
     "public.pipeline_step": {
       "name": "pipeline_step",
       "schema": "public",
       "values": [
         "collect",
         "extract",
-        "dedupe",
+        "cluster",
         "plan",
         "script",
         "check",
@@ -1049,22 +1611,12 @@
         "publish"
       ]
     },
-    "public.saved_item_kind": {
-      "name": "saved_item_kind",
+    "public.plan": {
+      "name": "plan",
       "schema": "public",
       "values": [
-        "link",
-        "email",
-        "rss"
-      ]
-    },
-    "public.saved_item_status": {
-      "name": "saved_item_status",
-      "schema": "public",
-      "values": [
-        "queued",
-        "used",
-        "skipped"
+        "free",
+        "plus"
       ]
     },
     "public.step_run_status": {

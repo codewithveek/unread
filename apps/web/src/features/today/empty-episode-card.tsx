@@ -6,12 +6,13 @@ import type { EpisodeDateParts } from "./format-date";
 export interface EmptyEpisodeCardProps {
   seed: string;
   date: EpisodeDateParts;
-  deliveryTime: string;
-  hasTopics: boolean;
+  /** "every Monday at 7:00" */
+  schedule: string;
+  forwardingAddress: string;
 }
 
 /** Home's episode card before the first episode exists. */
-export function EmptyEpisodeCard({ seed, date, deliveryTime, hasTopics }: EmptyEpisodeCardProps) {
+export function EmptyEpisodeCard({ seed, date, schedule, forwardingAddress }: EmptyEpisodeCardProps) {
   return (
     <section aria-label="Today's episode" className="overflow-hidden rounded-[20px] border border-line bg-surface">
       <EpisodeCover seed={seed} day={date.day} caption={date.caption} muted />
@@ -19,16 +20,16 @@ export function EmptyEpisodeCard({ seed, date, deliveryTime, hasTopics }: EmptyE
         <div className="flex flex-col gap-1">
           <p className="m-0 text-[17px] font-semibold tracking-[-0.01em]">No episode yet</p>
           <p className="m-0 text-sm leading-[1.45] text-muted-foreground">
-            {hasTopics
-              ? `Your first episode is on its way. After that, a new one arrives every morning at ${deliveryTime}.`
-              : `Pick a few topics and we'll make your first episode. After that, a new one arrives every morning at ${deliveryTime}.`}
+            Forward a few newsletters to your Unread address and we&apos;ll turn them into one short episode. After
+            that, a new one arrives {schedule}, whenever there&apos;s something new.
           </p>
         </div>
-        {hasTopics ? null : (
-          <Button asChild size="lg" className="self-start">
-            <Link href="/topics">Pick your topics</Link>
-          </Button>
-        )}
+        <p className="m-0 truncate rounded-xl border border-line bg-surface-2 px-3.5 py-3 font-mono text-[13px] text-text-2">
+          {forwardingAddress}
+        </p>
+        <Button asChild size="lg" className="self-start">
+          <Link href="/sources">Set up forwarding</Link>
+        </Button>
       </div>
     </section>
   );

@@ -2,9 +2,9 @@ import type { PipelineStep } from "@unread/db";
 
 /** Listener-facing names for the pipeline steps (prd §6). */
 export const PIPELINE_STEP_LABELS: Record<PipelineStep, string> = {
-  collect: "Finding today's stories",
-  extract: "Reading the articles",
-  dedupe: "Merging duplicate stories",
+  collect: "Gathering new newsletters and links",
+  extract: "Splitting issues into stories",
+  cluster: "Merging stories covered more than once",
   plan: "Planning the episode",
   script: "Writing the script",
   check: "Checking every fact against its source",

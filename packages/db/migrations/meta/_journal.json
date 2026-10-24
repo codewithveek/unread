@@ -5,15 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1792778738167,
+      "when": 1792815421658,
       "tag": "0000_enable-pgvector",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1792778738961,
+      "when": 1792815422486,
       "tag": "0001_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792815423304,
+      "tag": "0002_listening-events-hypertable",
       "breakpoints": true
     }
   ]

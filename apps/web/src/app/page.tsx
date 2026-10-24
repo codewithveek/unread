@@ -12,14 +12,14 @@ export default async function LandingPage() {
       <BrandMark />
       <div className="flex flex-col gap-4">
         <p className="m-0 font-mono text-[13px] font-medium tracking-[0.02em] text-muted-foreground">
-          YOUR UNREAD PILE, AS A PODCAST
+          YOUR NEWSLETTERS, AS A PODCAST
         </p>
         <h1 className="m-0 text-[40px] leading-[1.05] font-bold tracking-[-0.03em] sm:text-[52px]">
-          Saved 40 things, read 3? Listen to the rest on the way to work.
+          Your newsletters, minus the overlap, in 10 minutes of audio.
         </h1>
         <p className="m-0 text-base leading-[1.5] text-muted-foreground">
-          Every morning, Unread turns the latest stories on your topics, plus the links and newsletters you saved, into
-          one short episode with chapters and sources, delivered to the podcast app you already use.
+          Forward your newsletters to Unread. We merge the stories they share, summarise what matters with a source for
+          every line, and deliver one short episode to the podcast app you already use.
         </p>
       </div>
       <div className="flex flex-col gap-3 sm:flex-row">

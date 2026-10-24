@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: "Unread", template: "%s · Unread" },
   description:
-    "Every morning, Unread turns the latest stories on your topics and the links you saved into one short podcast episode.",
+    "Forward your newsletters to Unread and get one short, deduplicated podcast episode with the parts that matter.",
 };
 
 export const viewport: Viewport = {

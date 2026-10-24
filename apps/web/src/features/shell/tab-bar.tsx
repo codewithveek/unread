@@ -17,7 +17,7 @@ export function TabBar({ className }: { className?: string }) {
       )}
     >
       <ul className="mx-auto grid max-w-[640px] grid-cols-3">
-        {NAV_ITEMS.filter((item) => item.inTabBar).map(({ href, label, Icon }) => {
+        {NAV_ITEMS.map(({ href, label, Icon }) => {
           const active = isActive(pathname, href);
           return (
             <li key={href}>

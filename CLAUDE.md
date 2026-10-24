@@ -1,11 +1,12 @@
 # Unread
 
-Your unread pile as a daily podcast. Spec: `docs/prd-unread.md`. UI reference: `docs/design/` (phone canvases; desktop rules in PRD §8). Decisions: `docs/decisions/`.
+Your newsletters as a podcast. Spec: `docs/prd-unread.md` (v2). UI reference: `docs/design/` (phone canvases; desktop rules in PRD §9). Decisions: `docs/decisions/`.
 
 ## Layout
 - `apps/web`: Next.js 16 App Router (UI + route handlers). Auth0 via `src/proxy.ts`.
 - `packages/db`: Drizzle schema, migrations, `createDb`, id helpers.
-- `apps/worker`: Temporal worker (from U1).
+- `apps/inbound-worker`: Cloudflare Email Worker that relays forwarded mail to `/inbound/email` (U1, ADR 0004).
+- `apps/worker`: Temporal worker for the episode pipeline (from U2).
 
 ## Commands
 - `pnpm dev` / `pnpm build`

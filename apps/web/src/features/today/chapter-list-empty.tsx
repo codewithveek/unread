@@ -8,7 +8,7 @@ export function ChapterListEmpty() {
         In this episode
       </h2>
       <p className="m-0 pt-1 pb-2 text-sm text-muted-foreground">
-        Chapters show up here once an episode is ready. Each morning, Unread:
+        Chapters show up here once an episode is ready. For each episode, Unread:
       </p>
       <StepProgress />
     </section>
