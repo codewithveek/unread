@@ -51,6 +51,8 @@
     "./util/rate-limit": "./src/util/rate-limit.ts",
     "./voice/voices": "./src/voice/voices.ts",
     "./episodes/requests": "./src/episodes/requests.ts",
-    "./episodes/transcript": "./src/episodes/transcript.ts"
+    "./episodes/transcript": "./src/episodes/transcript.ts",
+    "./news": "./src/news/index.ts",
+    "./billing": "./src/billing/index.ts"
   }
 }

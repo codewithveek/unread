@@ -10,7 +10,9 @@
     "test": "vitest run --passWithNoTests",
     "start": "tsx src/main.ts",
     "make-episode": "tsx src/cli/make-episode.ts",
-    "dispatch": "tsx src/cli/dispatch.ts"
+    "dispatch": "tsx src/cli/dispatch.ts",
+    "promo": "tsx src/cli/promo.ts",
+    "warm-models": "tsx src/cli/warm-models.ts"
   },
   "dependencies": {
     "@temporalio/activity": "1.24.0",

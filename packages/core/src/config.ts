@@ -33,6 +33,8 @@ const envSchema = z.object({
   MODEL_TIMEOUT_MS: z.coerce.number().int().positive().default(90_000),
 
   EMBEDDING_MODEL: z.string().default("onnx-community/embeddinggemma-300m-ONNX"),
+  /** Where ONNX models are cached (pre-filled in the worker image). */
+  MODEL_CACHE_DIR: z.string().default(join(tmpdir(), "unread-models")),
   KOKORO_MODEL: z.string().default("onnx-community/Kokoro-82M-v1.0-ONNX"),
   KOKORO_CONCURRENCY: z.coerce.number().int().min(1).max(8).default(2),
   ELEVENLABS_API_KEY: optional,

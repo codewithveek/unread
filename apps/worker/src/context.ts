@@ -24,7 +24,7 @@ export function workerContext(): WorkerContext {
     db: createDb({ url: config.env.DATABASE_URL, max: 5 }),
     storage: storageFromConfig(config),
     model: () => (model ??= modelClientFromConfig(config)),
-    embedder: createEmbeddingGemma({ modelId: config.env.EMBEDDING_MODEL }),
+    embedder: createEmbeddingGemma({ modelId: config.env.EMBEDDING_MODEL, cacheDir: config.env.MODEL_CACHE_DIR }),
   };
   return cached;
 }

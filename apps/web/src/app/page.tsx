@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BrandMark } from "@/features/shell/brand-mark";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,9 @@ export default async function LandingPage() {
           <a href="/auth/login?returnTo=/today">Sign in</a>
         </Button>
       </div>
+      <Link href="/privacy" className="text-sm text-muted-foreground">
+        Privacy: what we store and who sees it
+      </Link>
     </main>
   );
 }

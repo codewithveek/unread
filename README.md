@@ -2,34 +2,62 @@
 
 Forward your newsletters to Unread and get one short, deduplicated podcast episode with the parts that matter, in a voice you choose, delivered to the podcast app you already use.
 
-- Product spec: [docs/prd-unread.md](docs/prd-unread.md)
-- Design reference: [docs/design/](docs/design/README.md)
-- Decisions: [docs/decisions/](docs/decisions/README.md)
+- Product spec: [docs/prd-unread.md](docs/prd-unread.md) · Design: [docs/design/](docs/design/README.md) · Decisions: [docs/decisions/](docs/decisions/README.md) · Deploy: [docs/deploy.md](docs/deploy.md)
+
+## How it works
+
+```
+newsletter ─► Cloudflare Email Routing ─► Email Worker ─signed─► /inbound/email
+              (SPF/DKIM)                  (apps/inbound-worker)     verified sender? clean, split into stories
+                                                                    │
+Temporal schedule / "Make one now" ─► make-episode workflow (apps/worker)
+   collect → EmbeddingGemma + pgvector clustering → Gemma plan → Gemma script → fact check
+   → Kokoro (Free) / ElevenLabs (Plus) → ffmpeg −16 LUFS → seeded cover → publish
+                                                                    │
+private RSS feed (/feed/<token>.xml) + web player (Next.js, apps/web)
+```
+
+## Repo
+
+| Path | What |
+|---|---|
+| `apps/web` | Next.js 16: onboarding, Home, Now playing, Sources, Settings, admin; inbound, feed, audio, billing routes |
+| `apps/worker` | Temporal worker (or poller), CLIs: `brief`, `make-episode`, `dispatch`, `promo`, `warm-models` |
+| `apps/inbound-worker` | Cloudflare Email Worker relaying signed raw MIME |
+| `packages/core` | Inbound parsing, pipeline, model client, voices, audio, cover, feed, plans, promos, billing, news, links |
+| `packages/db` | Drizzle schema + migrations (Postgres on Tiger Data, pgvector, Timescale) |
 
 ## Status
 
 | Milestone | State |
 |---|---|
-| U0 · Repo, Next.js, Drizzle schema, Auth0 sign-in, design tokens | Done |
-| U1 · Inbound email (Cloudflare Email Routing), verified senders, cleaning, Gmail confirmation | Next |
+| U0 Repo, Next.js, schema, Auth0, tokens | Done |
+| U1 Inbound email (Cloudflare), verified senders, cleaning, Gmail code | Done (needs Cloudflare deploy) |
+| U2 Cluster, plan, script, check + `pnpm brief` | Done (needs a Gemma key for real runs) |
+| U3 Voice, cover, publish, feed | Done with Kokoro; ElevenLabs waits for its API key |
+| U4 UI, responsive, global player | Done |
+| U5 Links, news, plans, promos, Bachs, Temporal, deploy config | Done in code; needs provider accounts + deploy |
+| U6 Submission | Yours |
 
 ## Run locally
 
-Requires Node 22 and pnpm 10, plus Postgres 16 with pgvector (Tiger Data in production, which adds TimescaleDB).
+Node 22, pnpm 10, Postgres 16 with pgvector, ffmpeg.
 
 ```sh
 pnpm install
-cp .env.example apps/web/.env.local   # fill in Auth0 + DATABASE_URL
+cp .env.example apps/web/.env.local          # fill in what you have
 DATABASE_URL=… pnpm db:migrate
-pnpm dev                              # http://localhost:3000
+pnpm dev                                     # web on :3000
+DATABASE_URL=… pnpm worker                   # episodes (polls without Temporal)
+DATABASE_URL=… pnpm brief --user <id>        # script JSON only (needs GEMINI_API_KEY or OPENROUTER_API_KEY)
+DATABASE_URL=… pnpm make-episode --user <id> # full episode in-process
 ```
 
-The Auth0 tenant setup is in [docs/decisions/0002-auth0-sign-in.md](docs/decisions/0002-auth0-sign-in.md).
-
-Note: a `DATABASE_URL` already set in your shell takes precedence over `.env.local`.
-
-## Checks
+## Tests
 
 ```sh
-pnpm typecheck && pnpm lint && pnpm test && pnpm build
+pnpm typecheck && pnpm lint && pnpm test
+# integration (Postgres): TEST_DATABASE_URL=postgres://…/unread_test pnpm test
+# + real EmbeddingGemma/Kokoro/ffmpeg: RUN_EMBEDDING_TESTS=1
+# + Temporal time-skipping: RUN_TEMPORAL_TESTS=1
 ```

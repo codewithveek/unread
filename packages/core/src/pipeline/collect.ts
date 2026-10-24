@@ -20,8 +20,10 @@ export async function collectCandidates(options: {
   now: Date;
   maxAgeDays?: number;
   limit?: number;
+  /** "always": news gets a guaranteed segment; "fill": news only fills spare room (prd §4.3). */
+  newsMode?: "always" | "fill";
 }): Promise<Candidate[]> {
-  const { db, userId, now, maxAgeDays = 21, limit = 60 } = options;
+  const { db, userId, now, maxAgeDays = 21, limit = 60, newsMode = "fill" } = options;
   const since = new Date(now.getTime() - maxAgeDays * 86_400_000);
   const rows = await db
     .select({ item: schema.items, newsletter: schema.newsletters })
@@ -49,7 +51,13 @@ export async function collectCandidates(options: {
           : `Your link${hostOf(item.url) ? ` · ${hostOf(item.url)}` : ""}`;
     // Links the user saved on purpose rank like "always"; news only fills.
     const priority: Priority =
-      item.sourceKind === "newsletter" ? (newsletter?.priority ?? "normal") : item.sourceKind === "news" ? "if_room" : "always";
+      item.sourceKind === "newsletter"
+        ? (newsletter?.priority ?? "normal")
+        : item.sourceKind === "news"
+          ? newsMode === "always"
+            ? "normal"
+            : "if_room"
+          : "always";
     return {
       id: item.id,
       sourceKind: item.sourceKind,

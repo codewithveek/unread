@@ -1,0 +1,90 @@
+# Render Blueprint (ADR 0008). Secrets are set in the dashboard (sync: false).
+envVarGroups:
+  - name: unread-shared
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_BASE_URL
+        value: https://getunread.site
+      - key: STORAGE_DRIVER
+        value: s3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        value: auto
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: INBOUND_EMAIL_DOMAIN
+        value: in.getunread.site
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: SERPAPI_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: TEMPORAL_ADDRESS
+        sync: false
+      - key: TEMPORAL_NAMESPACE
+        sync: false
+      - key: TEMPORAL_API_KEY
+        sync: false
+
+services:
+  - type: web
+    name: unread-web
+    runtime: node
+    plan: starter
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @unread/web build
+    startCommand: pnpm --filter @unread/web start
+    preDeployCommand: pnpm db:migrate
+    healthCheckPath: /privacy
+    domains:
+      - getunread.site
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - fromGroup: unread-shared
+      - key: AUTH0_DOMAIN
+        sync: false
+      - key: AUTH0_CLIENT_ID
+        sync: false
+      - key: AUTH0_CLIENT_SECRET
+        sync: false
+      - key: AUTH0_SECRET
+        generateValue: true
+      - key: APP_BASE_URL
+        value: https://getunread.site
+      - key: INBOUND_WEBHOOK_SECRET
+        sync: false
+      - key: BACHS_API_URL
+        value: https://sandbox-api.bachs.io
+      - key: BACHS_API_KEY
+        sync: false
+      - key: BACHS_WEBHOOK_SECRET
+        sync: false
+      - key: BACHS_PLUS_MONTHLY_PRODUCT_ID
+        sync: false
+      - key: BACHS_PLUS_YEARLY_PRODUCT_ID
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+
+  # Kokoro is CPU-bound and EmbeddingGemma needs ~1 GB RAM: use Standard or above.
+  - type: worker
+    name: unread-worker
+    runtime: docker
+    plan: standard
+    dockerfilePath: ./apps/worker/Dockerfile
+    dockerContext: .
+    envVars:
+      - fromGroup: unread-shared
+      - key: KOKORO_CONCURRENCY
+        value: "2"

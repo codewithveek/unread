@@ -11,7 +11,11 @@ export * from "./voices";
 /** Provider for the user's effective plan (prd §8.1). */
 export function voiceProviderFor(id: VoiceProviderId, config: CoreConfig): VoiceProvider {
   if (id === "kokoro") {
-    return createKokoroProvider({ modelId: config.env.KOKORO_MODEL, concurrency: config.env.KOKORO_CONCURRENCY });
+    return createKokoroProvider({
+      modelId: config.env.KOKORO_MODEL,
+      concurrency: config.env.KOKORO_CONCURRENCY,
+      cacheDir: config.env.MODEL_CACHE_DIR,
+    });
   }
   throw new VoiceNotConfiguredError("ElevenLabs isn't set up yet (ELEVENLABS_API_KEY)");
 }

@@ -2,7 +2,8 @@ import { schema } from "@unread/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { assembleEpisode, decodeToPcm } from "../audio";
 import { coverSvg, renderCoverPng } from "../cover";
-import { buildScript, type EpisodeScript, scriptCharacters } from "../pipeline";
+import { fetchNewsItems } from "../news";
+import { buildScript, type EpisodeScript, MAX_CHAPTER_CHARS, MIN_CHAPTER_CHARS, scriptCharacters } from "../pipeline";
 import { loadPlanContext } from "../plans";
 import { getJson, putJson, storageKeys } from "../storage";
 import { spokenDate } from "../util/dates";
@@ -88,6 +89,37 @@ export async function startEpisode(deps: EpisodeDeps, requestId: string): Promis
   return { status: "started", episodeId: episode.id };
 }
 
+/**
+ * Opt-in news before collecting (prd §4.3): "always" fetches every time;
+ * "fill" only when queued newsletters and links won't fill ~75% of the budget.
+ */
+export async function maybeFetchNews(deps: EpisodeDeps, options: { userId: string; maxChars: number; now: Date }): Promise<number> {
+  const { db } = deps;
+  const apiKey = deps.config.env.SERPAPI_API_KEY;
+  const [user] = await db.select().from(schema.users).where(eq(schema.users.id, options.userId)).limit(1);
+  if (!user?.newsOptIn || !apiKey) return 0;
+  const topics = await db.select().from(schema.userTopics).where(eq(schema.userTopics.userId, user.id));
+  if (topics.length === 0) return 0;
+  if (user.newsMode === "fill") {
+    const queued = await db
+      .select({ length: sql<number>`coalesce(length(${schema.items.text}), 0)::int` })
+      .from(schema.items)
+      .where(and(eq(schema.items.userId, user.id), eq(schema.items.status, "queued"), sql`${schema.items.sourceKind} <> 'news'`));
+    const estimate = queued.reduce((sum, q) => sum + Math.max(MIN_CHAPTER_CHARS, Math.min(MAX_CHAPTER_CHARS, q.length * 0.28)), 0);
+    if (estimate >= options.maxChars * 0.75) return 0;
+  }
+  const ids = await fetchNewsItems({
+    db,
+    userId: user.id,
+    apiKey,
+    country: user.newsCountry ?? "US",
+    language: user.newsLanguage ?? "en",
+    topics: topics.map((t) => t.query),
+    now: options.now,
+  });
+  return ids.length;
+}
+
 /** Steps 1–6. Not enough new content → no episode, no cost (prd §6). */
 export async function prepareScript(deps: EpisodeDeps, episodeId: string): Promise<PrepareResult> {
   const { db, storage } = deps;
@@ -97,7 +129,9 @@ export async function prepareScript(deps: EpisodeDeps, episodeId: string): Promi
   if (existing) return { status: "ok" };
 
   const ctx = await loadPlanContext({ db, userId: user.id, now });
+  await maybeFetchNews(deps, { userId: user.id, maxChars: ctx.budget.maxChars, now });
   const result = await buildScript({
+    newsMode: user.newsMode,
     db,
     model: deps.model(),
     embedder: deps.embedder,

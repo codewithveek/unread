@@ -30,6 +30,7 @@ export async function buildScript(options: {
   maxChars: number;
   dateLabel: string;
   now: Date;
+  newsMode?: "always" | "fill";
 }): Promise<BuildScriptResult> {
   const timingsMs: Record<string, number> = {};
   const time = async <T>(step: string, fn: () => Promise<T>): Promise<T> => {
@@ -42,7 +43,7 @@ export async function buildScript(options: {
   };
   const { db, model, embedder, userId, now } = options;
 
-  const candidates = await time("collect", () => collectCandidates({ db, userId, now }));
+  const candidates = await time("collect", () => collectCandidates({ db, userId, now, newsMode: options.newsMode }));
   const empty = (heard = 0): BuildScriptResult => ({
     status: "not_enough_content",
     script: null,
