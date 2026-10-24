@@ -14,3 +14,11 @@ How to use them:
 - `{{accent}}` = the accent token (default #5B9BFF). The list data inside each `renderVals()` is sample content.
 - Tokens: ground #0E0F12, surface #17181D, surface-2 #1F2128, line #2A2D35, text #F2F3F5, text-2 #D6D9DF, muted #A3A8B3, accent #5B9BFF, on-accent #0A1A33. Fonts: Geist, Geist Mono.
 - Desktop (>= 1024px) layout is described in prd-unread.md §8; it is not drawn here.
+
+## Landing page
+
+| File | Page |
+|---|---|
+| Landing.dc.html | Marketing landing page for getunread.site (fluid, responsive; desktop 1440 wide, stacks on phone) |
+
+Build it as the `/` route (marketing) with the same tokens as the app. Copy in the file is final unless noted ([PRICE] is a placeholder). All primary buttons lead to sign-up / onboarding ("Make my first episode").

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unread · Your newsletters as a podcast</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0F12}
+a{color:#F2F3F5}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="background: #0E0F12; color: #F2F3F5; font-family: Geist, system-ui, sans-serif; min-height: 100vh">
+
+  <header style="border-bottom: 1px solid #1F2128">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+      <a href="#top" style="display: flex; align-items: center; gap: 8px; text-decoration: none">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: {{accent}}; display: inline-block"></span>
+        <span style="font-size: 18px; font-weight: 700; letter-spacing: -0.02em">Unread</span>
+      </a>
+      <nav aria-label="Main" style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px; font-size: 14px">
+        <a href="#how" style="text-decoration: none; color: #A3A8B3">How it works</a>
+        <a href="#pricing" style="text-decoration: none; color: #A3A8B3">Pricing</a>
+        <a href="#faq" style="text-decoration: none; color: #A3A8B3">FAQ</a>
+        <a href="Onboarding.dc.html" style="text-decoration: none; background: {{accent}}; color: #0A1A33; font-weight: 600; padding: 10px 16px; border-radius: 10px">Start free</a>
+      </nav>
+    </div>
+  </header>
+
+  <section id="top" style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 64px; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+    <div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+      <span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}; letter-spacing: 0.08em">FOR EVERYONE WITH TOO MANY NEWSLETTERS</span>
+      <h1 style="margin: 0; font-size: clamp(44px, 6.4vw, 84px); line-height: 0.98; font-weight: 700; letter-spacing: -0.045em">Your newsletters, as one short <span style="color: transparent; -webkit-text-stroke: 1.5px #F2F3F5">podcast.</span></h1>
+      <p style="margin: 0; max-width: 520px; font-size: 18px; line-height: 1.55; color: #A3A8B3">Forward the newsletters piling up in your inbox. Each morning, Unread turns them into one short episode for your commute, walk or workout.</p>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <a href="Onboarding.dc.html" style="text-decoration: none; background: {{accent}}; color: #0A1A33; font-weight: 600; font-size: 15px; padding: 14px 20px; border-radius: 12px">Make my first episode</a>
+        <a href="#sample" style="text-decoration: none; border: 1px solid #2A2D35; color: #F2F3F5; font-weight: 500; font-size: 15px; padding: 14px 20px; border-radius: 12px">Play a sample</a>
+      </div>
+      <p style="margin: -12px 0 0; font-size: 13px; color: #A3A8B3">Free to start · No card needed · Set up in 2 minutes</p>
+      <div id="sample" style="display: flex; align-items: center; gap: 14px; background: #17181D; border: 1px solid #2A2D35; border-radius: 16px; padding: 12px 16px 12px 12px; max-width: 520px">
+        <button aria-label="Play sample episode" style="width: 44px; height: 44px; border-radius: 50%; border: 0; background: {{accent}}; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="#0A1A33"></path></svg></button>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 13px"><span style="font-weight: 600">Sample: 6 newsletters in 9 minutes</span><span style="font-family: 'Geist Mono', monospace; color: #A3A8B3">0:00 / 8:40</span></div>
+          <div style="height: 4px; border-radius: 2px; background: #2A2D35"><div style="width: 14%; height: 4px; border-radius: 2px; background: {{accent}}"></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="flex: 1 1 380px; min-width: 0">
+      <svg role="img" aria-label="Unread episode cover art" viewBox="0 0 480 480" style="width: 100%; height: auto; display: block; border-radius: 28px; background: #17181D">
+        <rect width="480" height="480" rx="28" fill="#17181D"></rect>
+        <g fill="{{accent}}">
+          <rect x="40" y="250" width="22" height="190" rx="11"></rect><rect x="76" y="190" width="22" height="250" rx="11" opacity="0.5"></rect>
+          <rect x="112" y="300" width="22" height="140" rx="11"></rect><rect x="148" y="150" width="22" height="290" rx="11" opacity="0.3"></rect>
+          <rect x="184" y="230" width="22" height="210" rx="11"></rect><rect x="220" y="330" width="22" height="110" rx="11" opacity="0.5"></rect>
+          <rect x="256" y="200" width="22" height="240" rx="11"></rect>
+        </g>
+        <g fill="#F2F3F5" opacity="0.12">
+          <rect x="292" y="270" width="22" height="170" rx="11"></rect><rect x="328" y="320" width="22" height="120" rx="11"></rect>
+          <rect x="364" y="240" width="22" height="200" rx="11"></rect><rect x="400" y="350" width="22" height="90" rx="11"></rect>
+        </g>
+        <text x="440" y="96" text-anchor="end" fill="#F2F3F5" font-family="Geist, sans-serif" font-size="88" font-weight="700" letter-spacing="-4">27</text>
+        <text x="440" y="126" text-anchor="end" fill="#A3A8B3" font-family="Geist Mono, monospace" font-size="16">OCT · TUESDAY BRIEF</text>
+      </svg>
+    </div>
+  </section>
+
+  <section id="how" style="border-top: 1px solid #1F2128">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-direction: column; gap: 48px">
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: flex-end">
+        <span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}; letter-spacing: 0.08em">HOW IT WORKS</span>
+        <h2 style="margin: 0; flex: 0 1 620px; font-size: clamp(34px, 4.2vw, 56px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em">Set it up once. Listen every day.</h2>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px">
+        <sc-for list="{{steps}}" as="step" hint-placeholder-count="3">
+          <div style="background: #17181D; border: 1px solid #2A2D35; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+            <span style="font: 500 13px 'Geist Mono', monospace; color: {{accent}}">{{step.number}}</span>
+            <h3 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">{{step.title}}</h3>
+            <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #A3A8B3">{{step.body}}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top: 1px solid #1F2128; background: #121318">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-direction: column; gap: 48px">
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: flex-end">
+        <span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}; letter-spacing: 0.08em">NO REPEATS</span>
+        <div style="flex: 0 1 620px; display: flex; flex-direction: column; gap: 14px">
+          <h2 style="margin: 0; font-size: clamp(34px, 4.2vw, 56px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em">Hear each story once.</h2>
+          <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #A3A8B3">Five newsletters covering the same news? You hear it once, and every chapter links back to the original issues.</p>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px">
+        <sc-for list="{{chapters}}" as="chapter" hint-placeholder-count="3">
+          <article style="display: flex; flex-direction: column; gap: 16px">
+            <div style="position: relative; aspect-ratio: 4 / 3; border-radius: 18px; overflow: hidden; background: #17181D; border: 1px solid #2A2D35">
+              <svg aria-hidden="true" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="width: 100%; height: 100%; display: block">
+                <g fill="{{accent}}" opacity="{{chapter.strength}}">
+                  <circle cx="{{chapter.cx}}" cy="150" r="120"></circle>
+                </g>
+                <g fill="none" stroke="#F2F3F5" stroke-opacity="0.12" stroke-width="2">
+                  <circle cx="{{chapter.cx}}" cy="150" r="150"></circle><circle cx="{{chapter.cx}}" cy="150" r="190"></circle><circle cx="{{chapter.cx}}" cy="150" r="230"></circle>
+                </g>
+              </svg>
+              <span style="position: absolute; left: 16px; bottom: 16px; font: 500 12px 'Geist Mono', monospace; background: #0E0F12; color: #F2F3F5; padding: 6px 10px; border-radius: 8px">{{chapter.merged}}</span>
+              <button aria-label="Play chapter" style="position: absolute; right: 16px; bottom: 16px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: {{accent}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+                <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="#0A1A33"></path></svg></button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <span style="font: 500 12px 'Geist Mono', monospace; color: #A3A8B3">{{chapter.meta}}</span>
+              <h3 style="margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -0.015em">{{chapter.title}}</h3>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+      <p style="margin: 0; font-size: 13px; color: #8A909C">Example episode.</p>
+    </div>
+  </section>
+
+  <section style="border-top: 1px solid #1F2128">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-wrap: wrap; gap: 48px">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px">
+        <span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}; letter-spacing: 0.08em">OPTIONAL · NEWS</span>
+        <h2 style="margin: 0; font-size: clamp(34px, 4.2vw, 56px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em">Want the news too?</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #A3A8B3">Pick a few topics and we'll add the day's biggest stories. Prefer just your newsletters? Leave it off.</p>
+      </div>
+      <ul style="flex: 1 1 520px; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+        <sc-for list="{{topics}}" as="topic" hint-placeholder-count="7">
+          <li style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #1F2128">
+            <span style="font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; letter-spacing: -0.02em">{{topic}}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A3A8B3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"></path><path d="M8 7h9v9"></path></svg>
+          </li>
+        </sc-for>
+      </ul>
+    </div>
+  </section>
+
+  <section id="pricing" style="border-top: 1px solid #1F2128; background: #121318">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-direction: column; gap: 48px">
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: flex-end">
+        <span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}; letter-spacing: 0.08em">PRICING</span>
+        <h2 style="margin: 0; flex: 0 1 620px; font-size: clamp(34px, 4.2vw, 56px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em">Free every week. Every day on Plus.</h2>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+        <div style="background: #17181D; border: 1px solid #2A2D35; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 20px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h3 style="margin: 0; font-size: 22px; font-weight: 600">Free</h3>
+            <p style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.03em">$0</p>
+          </div>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 15px; color: #D6D9DF">
+            <li>One episode a week</li><li>Up to 10 minutes</li><li>4 voices to choose from</li><li>Optional news topics</li><li>Works in your podcast app</li>
+          </ul>
+          <a href="Onboarding.dc.html" style="margin-top: auto; text-align: center; text-decoration: none; border: 1px solid #2A2D35; padding: 14px; border-radius: 12px; font-weight: 600">Start free</a>
+        </div>
+        <div style="background: #17181D; border: 1px solid {{accent}}; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 20px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; justify-content: space-between; align-items: center"><h3 style="margin: 0; font-size: 22px; font-weight: 600">Plus</h3><span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}">STUDIO VOICES</span></div>
+            <p style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.03em">[PRICE]<span style="font-size: 16px; font-weight: 500; color: #A3A8B3"> / month</span></p>
+          </div>
+          <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 15px; color: #D6D9DF">
+            <li>A fresh episode every morning</li><li>5, 10 or 20 minutes</li><li>Studio-quality voices, and a library to pick from</li><li>Everything in Free</li>
+          </ul>
+          <a href="Onboarding.dc.html" style="margin-top: auto; text-align: center; text-decoration: none; background: {{accent}}; color: #0A1A33; padding: 14px; border-radius: 12px; font-weight: 600">Upgrade to Plus</a>
+          <p style="margin: 0; font-size: 13px; color: #A3A8B3; text-align: center">Got a promo code? Try Plus free. No card needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="border-top: 1px solid #1F2128">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-wrap: wrap; gap: 48px">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px">
+        <span style="font: 500 12px 'Geist Mono', monospace; color: {{accent}}; letter-spacing: 0.08em">FAQ</span>
+        <h2 style="margin: 0; font-size: clamp(34px, 4.2vw, 56px); line-height: 1.02; font-weight: 700; letter-spacing: -0.035em">Good questions.</h2>
+      </div>
+      <div style="flex: 1 1 520px; display: flex; flex-direction: column">
+        <sc-for list="{{faqs}}" as="faq" hint-placeholder-count="4">
+          <details style="border-bottom: 1px solid #1F2128; padding: 20px 0">
+            <summary style="cursor: pointer; font-size: 18px; font-weight: 600; list-style-position: outside">{{faq.q}}</summary>
+            <p style="margin: 12px 0 0; font-size: 15px; line-height: 1.6; color: #A3A8B3">{{faq.a}}</p>
+          </details>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: {{accent}}; color: #0A1A33">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 88px 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center">
+      <h2 style="margin: 0; font-size: clamp(36px, 5vw, 64px); line-height: 1.02; font-weight: 700; letter-spacing: -0.04em">Catch up on every newsletter without reading one.</h2>
+      <p style="margin: 0; max-width: 520px; font-size: 17px; line-height: 1.55">Setup takes two minutes. Your first episode is ready as soon as a newsletter arrives.</p>
+      <a href="Onboarding.dc.html" style="text-decoration: none; background: #0A1A33; color: #F2F3F5; font-weight: 600; font-size: 15px; padding: 14px 22px; border-radius: 12px">Make my first episode</a>
+      <p style="margin: 0; font-size: 13px">Free to start · No card needed</p>
+    </div>
+  </section>
+
+  <footer style="border-top: 1px solid #1F2128">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 40px 24px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-size: 14px; color: #A3A8B3">
+      <div style="display: flex; align-items: center; gap: 8px; color: #F2F3F5">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: {{accent}}; display: inline-block"></span><span style="font-weight: 700">Unread</span>
+        <span style="color: #8A909C; font-weight: 400">· getunread.site</span>
+      </div>
+      <nav aria-label="Footer" style="display: flex; flex-wrap: wrap; gap: 20px">
+        <a href="#how" style="text-decoration: none; color: #A3A8B3">How it works</a>
+        <a href="#pricing" style="text-decoration: none; color: #A3A8B3">Pricing</a>
+        <a href="#" style="text-decoration: none; color: #A3A8B3">Privacy</a>
+        <a href="#" style="text-decoration: none; color: #A3A8B3">Terms</a>
+      </nav>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#5B9BFF","options":["#5B9BFF","#FF7A1A","#7DD3A8","#F5B547"]},"$preview":{"width":1440,"height":5200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#5B9BFF',
+      steps: [
+        { number: '01', title: 'Forward your newsletters', body: 'Send them to your Unread address, or let Gmail, Outlook or Apple Mail forward them for you.' },
+        { number: '02', title: 'We do the reading', body: 'Unread picks out what matters, cuts the repeats and keeps it short.' },
+        { number: '03', title: 'Press play', body: 'Listen here, or in Apple Podcasts or Pocket Casts. New episodes show up on their own.' }
+      ],
+      chapters: [
+        { title: 'Why AI pricing changed again this week', meta: 'CHAPTER 1 · 2:10', merged: 'FROM 4 NEWSLETTERS', cx: 120, strength: 0.85 },
+        { title: 'The fundraising round everyone wrote about', meta: 'CHAPTER 2 · 1:45', merged: 'FROM 3 NEWSLETTERS', cx: 280, strength: 0.55 },
+        { title: 'A design essay you saved and never opened', meta: 'CHAPTER 3 · 2:30', merged: 'YOUR SAVED LINK', cx: 200, strength: 0.3 }
+      ],
+      topics: ['AI', 'Startups', 'Markets', 'Science', 'Football', 'Design', 'Climate'],
+      faqs: [
+        { q: 'Which newsletters work?', a: 'Any newsletter that arrives by email: Substack, Beehiiv, Ghost, company updates and more. You choose which senders go into episodes.' },
+        { q: 'Who sees my newsletters?', a: 'We use them only to make your episodes. They are never sold or shared for ads, and deleting your account deletes them.' },
+        { q: 'Is it the full newsletter read aloud?', a: 'No. You get the highlights in a few minutes, with links to the full issues when you want more.' },
+        { q: 'Can I listen in my own podcast app?', a: 'Yes. Add your private link to Apple Podcasts, Pocket Casts or most podcast apps once, and new episodes arrive there.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
