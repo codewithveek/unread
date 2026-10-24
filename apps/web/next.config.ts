@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@unread/db"],
+  transpilePackages: ["@unread/db", "@unread/core"],
+  // Native/ONNX packages stay out of the server bundle.
+  serverExternalPackages: ["kokoro-js", "@huggingface/transformers", "onnxruntime-node", "@resvg/resvg-js", "sharp"],
   typedRoutes: true,
   poweredByHeader: false,
 };

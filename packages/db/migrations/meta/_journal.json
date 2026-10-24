@@ -29,6 +29,27 @@
       "when": 1792817645437,
       "tag": "0003_billing-promos-voice",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792818140688,
+      "tag": "0004_trials-ratelimits-assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792818375207,
+      "tag": "0005_inbound-kinds-episode-requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792818574017,
+      "tag": "0006_inbound-message-id-per-user",
+      "breakpoints": true
     }
   ]
 }

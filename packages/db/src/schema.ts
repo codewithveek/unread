@@ -28,7 +28,13 @@ export const plan = pgEnum("plan", ["free", "plus"]);
 export const cadence = pgEnum("cadence", ["daily", "weekly"]);
 export const newsMode = pgEnum("news_mode", ["always", "fill"]);
 export const newsletterPriority = pgEnum("newsletter_priority", ["always", "normal", "if_room"]);
-export const inboundKind = pgEnum("inbound_kind", ["issue", "link", "forwarding_confirmation", "rejected"]);
+export const inboundKind = pgEnum("inbound_kind", [
+  "issue",
+  "link",
+  "forwarding_confirmation",
+  "sender_verification",
+  "rejected",
+]);
 export const inboundStatus = pgEnum("inbound_status", ["received", "processed", "rejected", "failed"]);
 export const itemSourceKind = pgEnum("item_source_kind", ["newsletter", "link", "news", "rss"]);
 export const itemStatus = pgEnum("item_status", ["queued", "used", "skipped"]);
@@ -49,6 +55,7 @@ export const pipelineStep = pgEnum("pipeline_step", [
 ]);
 export const stepRunStatus = pgEnum("step_run_status", ["running", "succeeded", "failed"]);
 export const voiceProvider = pgEnum("voice_provider", ["kokoro", "elevenlabs"]);
+export const trialEndedReason = pgEnum("trial_ended_reason", ["episodes", "expired", "upgraded"]);
 /** Our own subscription states; Bachs statuses are mapped onto these in the webhook handler. */
 export const subscriptionStatus = pgEnum("subscription_status", [
   "trialing",
@@ -125,6 +132,8 @@ export const verifiedSenders = pgTable(
     email: text().notNull(),
     /** Null until the address is confirmed; the sign-in email is verified by Auth0. */
     verifiedAt: timestamp({ withTimezone: true }),
+    /** Code the user sends from this address (in the subject) to prove they own it. */
+    verificationCode: text(),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex("verified_senders_user_email_key").on(t.userId, sql`lower(${t.email})`)],
@@ -155,7 +164,7 @@ export const inboundMessages = pgTable(
     /** Null when the alias matched no user (logged, then dropped). */
     userId: text().references(() => users.id, { onDelete: "cascade" }),
     newsletterId: text().references(() => newsletters.id, { onDelete: "set null" }),
-    /** RFC 5322 Message-ID; makes webhook retries idempotent. */
+    /** RFC 5322 Message-ID; unique per user, so webhook retries and double forwards are no-ops. */
     messageId: text().notNull(),
     fromEmail: text(),
     receivedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -170,7 +179,7 @@ export const inboundMessages = pgTable(
     rejectReason: text(),
   },
   (t) => [
-    uniqueIndex("inbound_messages_message_id_key").on(t.messageId),
+    uniqueIndex("inbound_messages_user_message_id_key").on(t.userId, t.messageId),
     index("inbound_messages_user_received_idx").on(t.userId, t.receivedAt),
   ],
 );
@@ -190,6 +199,10 @@ export const items = pgTable(
     title: text().notNull(),
     text: text(),
     textHash: text(),
+    /** Links found in the story, kept for citations: `[{ text, url }]`. */
+    links: jsonb().$type<{ text: string; url: string }[]>(),
+    /** For news items: the topic label, shown as "News · <label>". */
+    topicLabel: text(),
     /** Paywalled or blocked page: only title + snippet were available. */
     limited: boolean().notNull().default(false),
     publishedAt: timestamp({ withTimezone: true }),
@@ -388,6 +401,8 @@ export const promoCodes = pgTable(
     id: id(),
     code: text().notNull(),
     trialDays: integer().notNull(),
+    /** ElevenLabs episodes included in the trial (prd §8.3). */
+    trialEpisodeLimit: integer().notNull().default(3),
     maxRedemptions: integer(),
     redeemedCount: integer().notNull().default(0),
     expiresAt: timestamp({ withTimezone: true }),
@@ -417,6 +432,14 @@ export const promoRedemptions = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     redeemedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     trialEndsAt: timestamp({ withTimezone: true }).notNull(),
+    /** Copied from the code at redemption, so later edits to the code don't change a running trial. */
+    episodeLimit: integer().notNull().default(3),
+    /** Incremented atomically when a trial episode publishes. */
+    episodesUsed: integer().notNull().default(0),
+    endedAt: timestamp({ withTimezone: true }),
+    endedReason: trialEndedReason(),
+    /** Reminder emails already sent: "3-days" | "ended". */
+    remindersSent: jsonb().$type<string[]>().notNull().default([]),
   },
   (t) => [
     uniqueIndex("promo_redemptions_code_user_key").on(t.codeId, t.userId),
@@ -424,11 +447,68 @@ export const promoRedemptions = pgTable(
   ],
 );
 
+export const episodeRequestStatus = pgEnum("episode_request_status", ["pending", "running", "done", "skipped", "failed"]);
+export const episodeRequestReason = pgEnum("episode_request_reason", ["scheduled", "manual"]);
+
+/**
+ * One row per "make an episode" intent (schedule or "Make one now"). Temporal
+ * workflows are keyed by this id; without Temporal the worker polls this table.
+ */
+export const episodeRequests = pgTable(
+  "episode_requests",
+  {
+    id: id(),
+    userId: text()
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** The user's local date the episode is for. */
+    date: date({ mode: "string" }).notNull(),
+    reason: episodeRequestReason().notNull(),
+    status: episodeRequestStatus().notNull().default("pending"),
+    episodeId: text().references(() => episodes.id, { onDelete: "set null" }),
+    /** Why it was skipped or failed, shown to the user. */
+    message: text(),
+    createdAt: createdAt(),
+    startedAt: timestamp({ withTimezone: true }),
+    finishedAt: timestamp({ withTimezone: true }),
+  },
+  (t) => [
+    index("episode_requests_status_idx").on(t.status, t.createdAt),
+    uniqueIndex("episode_requests_scheduled_key")
+      .on(t.userId, t.date)
+      .where(sql`${t.reason} = 'scheduled'`),
+  ],
+);
+
+/** Fixed-window rate limits (paste, make-now, promo, inbound), shared across instances. */
+export const rateLimitHits = pgTable(
+  "rate_limit_hits",
+  {
+    key: text().notNull(),
+    windowStart: timestamp({ withTimezone: true }).notNull(),
+    count: integer().notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.key, t.windowStart] })],
+);
+
+/** Generated-once audio assets: SFX set and Studio-voice previews (prd §8.1). */
+export const audioAssets = pgTable("audio_assets", {
+  key: text().primaryKey(),
+  storageKey: text().notNull(),
+  durationS: real(),
+  createdAt: createdAt(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Episode = typeof episodes.$inferSelect;
 export type Chapter = typeof chapters.$inferSelect;
 export type Plan = (typeof plan.enumValues)[number];
 export type VoiceProvider = (typeof voiceProvider.enumValues)[number];
+export type Item = typeof items.$inferSelect;
+export type EpisodeRequest = typeof episodeRequests.$inferSelect;
+export type Newsletter = typeof newsletters.$inferSelect;
+export type PromoRedemption = typeof promoRedemptions.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
 export type Cadence = (typeof cadence.enumValues)[number];
 export type PipelineStep = (typeof pipelineStep.enumValues)[number];

@@ -11,6 +11,7 @@ import { db } from "@/lib/db";
 const sessionUserSchema = z.object({
   sub: z.string().min(1),
   email: z.email().optional(),
+  email_verified: z.boolean().optional(),
   name: z.string().optional(),
 });
 
@@ -45,6 +46,13 @@ async function findOrCreateUser(sessionUser: SessionUser): Promise<User> {
     .where(eq(schema.users.auth0Sub, sessionUser.sub))
     .limit(1);
   if (!created) throw new Error("Could not create user row");
+  // Auth0 has verified this address, so it may forward newsletters right away (prd §4.1).
+  if (sessionUser.email && sessionUser.email_verified) {
+    await db()
+      .insert(schema.verifiedSenders)
+      .values({ userId: created.id, email: sessionUser.email.toLowerCase(), verifiedAt: new Date() })
+      .onConflictDoNothing();
+  }
   return created;
 }
 

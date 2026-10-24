@@ -1,17 +1,14 @@
 import "server-only";
-import { z } from "zod";
+import { type CoreConfig, loadConfig } from "@unread/core/config";
 
-const serverEnvSchema = z.object({
-  DATABASE_URL: z.url(),
-  INBOUND_EMAIL_DOMAIN: z.string().min(1).default("in.getunread.site"),
-});
+let cached: CoreConfig | undefined;
 
-export type ServerEnv = z.infer<typeof serverEnvSchema>;
-
-let cached: ServerEnv | undefined;
-
-/** Validated server env. Read lazily so `next build` works without secrets. */
-export function serverEnv(): ServerEnv {
-  cached ??= serverEnvSchema.parse(process.env);
+/** Validated config shared with the worker. Read lazily so `next build` works without secrets. */
+export function coreConfig(): CoreConfig {
+  cached ??= loadConfig();
   return cached;
+}
+
+export function serverEnv(): CoreConfig["env"] {
+  return coreConfig().env;
 }

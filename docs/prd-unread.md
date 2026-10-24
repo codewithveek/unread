@@ -169,6 +169,12 @@ ElevenLabs API list prices (verify before launch): Flash/Turbo ≈ $0.04 per 1K 
 - Our own feature, independent of Bachs: a code grants **Plus for N days with no card**.
 - `promo_codes`: code (case-insensitive, unique), trial_days, max_redemptions, redeemed_count, expires_at, active, note. `promo_redemptions`: code_id, user_id, redeemed_at, trial_ends_at (unique per code + user).
 - Rules: one active trial per user; a user can't redeem a code while already on paid Plus; codes are rate-limited and validated server-side; redemption is atomic (no over-redeeming under concurrency).
+- **Email must be verified** (Auth0 `email_verified`) before a code can be redeemed, so throwaway sign-ups can't farm trials.
+- **Trial episode limit:** a trial includes at most **3 ElevenLabs episodes** (`trial_episode_limit`, default 3, set per code) and at most **10 minutes each** (≈ 9K characters). The trial ends at whichever comes first: the 3rd episode or the end date.
+  - Newsletters forwarded during the trial are never lost: items not used in the 3 trial episodes stay queued and go into the user's next Free (Kokoro) episode.
+  - "Make one now" counts toward the 3.
+  - The app shows "Trial: 2 of 3 Studio episodes left" in Settings and under the episode card.
+  - `promo_redemptions` gains `episodes_used` (incremented atomically when a trial episode publishes) and `ended_reason` (`episodes`/`expired`/`upgraded`).
 - **Effective plan** = paid Plus (from Bachs) OR an unexpired promo trial OR Free. Computed in one function used everywhere.
 - Trial end: email 3 days before and on the day ("Your Studio voice ends on…" + upgrade link); then back to Kokoro automatically, nothing lost.
 - Admin: create, deactivate and view redemptions of codes (a simple protected page or CLI).
@@ -252,4 +258,5 @@ Global player component with Media Session metadata and desktop shortcuts (space
 - The episode plays in a podcast app with cover and chapters, and in the web player on phone (390 px) and desktop (1440 px).
 - Mail from an unverified sender is rejected and never reaches a model.
 - Free episodes use Kokoro; redeeming a valid promo code switches the next episode to ElevenLabs until the trial ends, then back to Kokoro automatically.
+- An unverified email cannot redeem a code. A trial ends after its 3rd ElevenLabs episode even if days remain, and unused forwarded items appear in the next Free episode.
 - A Bachs sandbox payment upgrades the user only after the signed webhook arrives; a replayed webhook changes nothing.
