@@ -1,5 +1,5 @@
 import { type Database, schema } from "@unread/db";
-import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, sql } from "drizzle-orm";
 import { storageKeys, type Storage } from "../storage";
 import { normalizeForHash, sha256Hex } from "../util/hash";
 import { aliasFromAddress, normalizeAddress } from "./address";
@@ -263,7 +263,7 @@ export async function purgeRawEmails(options: { db: Database; storage: Storage; 
   const rows = await db
     .select({ id: schema.inboundMessages.id, rawKey: schema.inboundMessages.rawKey })
     .from(schema.inboundMessages)
-    .where(and(isNotNull(schema.inboundMessages.rawKey), sql`${schema.inboundMessages.receivedAt} < ${cutoff}`));
+    .where(and(isNotNull(schema.inboundMessages.rawKey), lt(schema.inboundMessages.receivedAt, cutoff)));
   for (const row of rows) {
     if (row.rawKey) await storage.delete(row.rawKey);
     await db.update(schema.inboundMessages).set({ rawKey: null }).where(eq(schema.inboundMessages.id, row.id));
@@ -271,7 +271,7 @@ export async function purgeRawEmails(options: { db: Database; storage: Storage; 
   // Unknown-alias rows carry no user data worth keeping.
   await db
     .delete(schema.inboundMessages)
-    .where(and(isNull(schema.inboundMessages.userId), sql`${schema.inboundMessages.receivedAt} < ${cutoff}`));
+    .where(and(isNull(schema.inboundMessages.userId), lt(schema.inboundMessages.receivedAt, cutoff)));
   return rows.length;
 }
 

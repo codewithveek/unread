@@ -6,3 +6,9 @@ onlyBuiltDependencies:
   - esbuild
   - sharp
   - unrs-resolver
+
+# transformers.js 3.x imports onnxruntime-common without declaring it.
+packageExtensions:
+  "@huggingface/transformers@3":
+    dependencies:
+      onnxruntime-common: "1.21.0"

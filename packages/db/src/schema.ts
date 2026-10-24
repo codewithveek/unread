@@ -250,12 +250,17 @@ export const episodes = pgTable(
     voiceModel: text(),
     costCents: integer(),
     audioKey: text(),
+    /** MP3 size, required by the feed's <enclosure length>. */
+    audioBytes: integer(),
     coverKey: text(),
+    /** Set while being made, so Home can show step progress. */
+    currentStep: pipelineStep(),
     transcript: jsonb(),
     error: jsonb(),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("episodes_user_date_key").on(t.userId, t.date)],
+  // Not unique: "Make one now" can add a second episode on a day; scheduled runs are deduped by episode_requests.
+  (t) => [index("episodes_user_date_idx").on(t.userId, t.date)],
 );
 
 export const chapters = pgTable(

@@ -50,6 +50,13 @@
       "when": 1792818574017,
       "tag": "0006_inbound-message-id-per-user",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792819410791,
+      "tag": "0007_episode-audio-bytes-step",
+      "breakpoints": true
     }
   ]
 }

@@ -11,7 +11,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1156.0",
     "@aws-sdk/s3-request-presigner": "^3.1156.0",
-    "@huggingface/transformers": "^4.3.1",
+    "@huggingface/transformers": "^3.8.1",
     "@mozilla/readability": "^0.6.0",
     "@resvg/resvg-js": "^2.6.2",
     "@unread/db": "workspace:*",
@@ -40,6 +40,13 @@
     "./embeddings": "./src/embeddings/index.ts",
     "./plans": "./src/plans/index.ts",
     "./pipeline": "./src/pipeline/index.ts",
-    "./util/dates": "./src/util/dates.ts"
+    "./util/dates": "./src/util/dates.ts",
+    "./episodes": "./src/episodes/index.ts",
+    "./voice": "./src/voice/index.ts",
+    "./audio": "./src/audio/index.ts",
+    "./cover": "./src/cover/index.ts",
+    "./feed": "./src/feed/index.ts",
+    "./promo": "./src/promo/index.ts",
+    "./mail": "./src/mail/index.ts"
   }
 }
