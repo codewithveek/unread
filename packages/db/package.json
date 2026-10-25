@@ -9,7 +9,7 @@
   },
   "scripts": {
     "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate",
+    "migrate": "node scripts/migrate.mjs",
     "studio": "drizzle-kit studio",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
