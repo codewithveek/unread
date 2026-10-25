@@ -1,6 +1,6 @@
 import "server-only";
 import { newFeedToken, newInboundAlias, schema, type User } from "@unread/db";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { cache } from "react";
@@ -46,14 +46,34 @@ async function findOrCreateUser(sessionUser: SessionUser): Promise<User> {
     .where(eq(schema.users.auth0Sub, sessionUser.sub))
     .limit(1);
   if (!created) throw new Error("Could not create user row");
-  // Auth0 has verified this address, so it may forward newsletters right away (prd §4.1).
-  if (sessionUser.email && sessionUser.email_verified) {
-    await db()
-      .insert(schema.verifiedSenders)
-      .values({ userId: created.id, email: sessionUser.email.toLowerCase(), verifiedAt: new Date() })
-      .onConflictDoNothing();
-  }
   return created;
+}
+
+/**
+ * Auth0 has verified this address, so it may forward newsletters (prd §4.1).
+ * Runs on every session, not only at sign-up: email/password users verify
+ * after their row exists, and the address may already be pending in Sources.
+ */
+async function trustSignInEmail(user: User, sessionUser: SessionUser): Promise<void> {
+  if (!sessionUser.email || !sessionUser.email_verified) return;
+  const email = sessionUser.email.toLowerCase();
+  await db()
+    .update(schema.verifiedSenders)
+    .set({ verifiedAt: new Date(), verificationCode: null })
+    .where(
+      and(
+        eq(schema.verifiedSenders.userId, user.id),
+        sql`lower(${schema.verifiedSenders.email}) = ${email}`,
+        isNull(schema.verifiedSenders.verifiedAt),
+      ),
+    );
+  await db().insert(schema.verifiedSenders).values({ userId: user.id, email, verifiedAt: new Date() }).onConflictDoNothing();
+}
+
+async function loadUser(sessionUser: SessionUser): Promise<User> {
+  const user = await findOrCreateUser(sessionUser);
+  await trustSignInEmail(user, sessionUser);
+  return user;
 }
 
 /**
@@ -67,7 +87,7 @@ export const requireUser = cache(async (returnTo: string = "/today"): Promise<Cu
     redirect(`/auth/login?returnTo=${encodeURIComponent(returnTo)}` as Route);
   }
   const sessionUser = sessionUserSchema.parse(session.user);
-  const user = await findOrCreateUser(sessionUser);
+  const user = await loadUser(sessionUser);
   return { user, sessionUser };
 });
 
@@ -76,5 +96,5 @@ export async function currentUser(): Promise<CurrentUser | null> {
   const session = await auth0.getSession();
   if (!session) return null;
   const sessionUser = sessionUserSchema.parse(session.user);
-  return { user: await findOrCreateUser(sessionUser), sessionUser };
+  return { user: await loadUser(sessionUser), sessionUser };
 }
