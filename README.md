@@ -61,3 +61,7 @@ pnpm typecheck && pnpm lint && pnpm test
 # + real EmbeddingGemma/Kokoro/ffmpeg: RUN_EMBEDDING_TESTS=1
 # + Temporal time-skipping: RUN_TEMPORAL_TESTS=1
 ```
+
+## License
+
+[MIT](LICENSE) © 2026 Lucky Victory. Model weights and third-party services keep their own terms (Kokoro-82M is Apache-2.0 and EmbeddingGemma is under the Gemma terms; both are downloaded at runtime or image build, not stored in this repo).
