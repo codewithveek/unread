@@ -1,5 +1,5 @@
 import { type Database, schema } from "@unread/db";
-import { and, asc, eq, gte, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNotNull, lt, ne, sql } from "drizzle-orm";
 import { localClock, localDate } from "../util/dates";
 
 /**
@@ -59,7 +59,15 @@ export async function requestEpisodeNow(options: {
   const [recent] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(schema.episodeRequests)
-    .where(and(eq(schema.episodeRequests.userId, userId), eq(schema.episodeRequests.reason, "manual"), gte(schema.episodeRequests.createdAt, since)));
+    .where(
+      and(
+        eq(schema.episodeRequests.userId, userId),
+        eq(schema.episodeRequests.reason, "manual"),
+        gte(schema.episodeRequests.createdAt, since),
+        // A failure on our side shouldn't use up the user's "make one now" (prd §12: "Try again").
+        ne(schema.episodeRequests.status, "failed"),
+      ),
+    );
   if ((recent?.count ?? 0) >= options.dailyLimit) {
     throw new RateLimitedError(`You can make ${options.dailyLimit} extra episode${options.dailyLimit === 1 ? "" : "s"} a day`);
   }
@@ -97,4 +105,65 @@ export async function pendingRequestIds(db: Database, limit = 20): Promise<strin
     .orderBy(asc(schema.episodeRequests.createdAt))
     .limit(limit);
   return rows.map((r) => r.id);
+}
+
+const STALE_MESSAGE = "it took too long to make, so we stopped it";
+
+async function failRequests(db: Database, requestIds: string[], message: string, now: Date): Promise<void> {
+  if (requestIds.length === 0) return;
+  const rows = await db
+    .update(schema.episodeRequests)
+    .set({ status: "failed", message, finishedAt: now })
+    .where(inArray(schema.episodeRequests.id, requestIds))
+    .returning({ episodeId: schema.episodeRequests.episodeId });
+  const episodeIds = rows.flatMap((r) => (r.episodeId ? [r.episodeId] : []));
+  if (episodeIds.length) {
+    await db
+      .update(schema.episodes)
+      .set({ status: "failed", error: { message, detail: "stale request" } })
+      .where(and(inArray(schema.episodes.id, episodeIds), ne(schema.episodes.status, "ready")));
+  }
+}
+
+/**
+ * Safety net for both runners (hourly maintenance): a request still "running"
+ * after `maxRunningMs` lost its worker, and one still "pending" after
+ * `maxPendingMs` was never picked up. Fail them so Home stops showing progress
+ * and "Make one now" works again.
+ */
+export async function failStaleRequests(options: { db: Database; now: Date; maxRunningMs?: number; maxPendingMs?: number }): Promise<number> {
+  const { db, now, maxRunningMs = 2 * 3_600_000, maxPendingMs = 6 * 3_600_000 } = options;
+  const running = await db
+    .select({ id: schema.episodeRequests.id })
+    .from(schema.episodeRequests)
+    .where(and(eq(schema.episodeRequests.status, "running"), lt(schema.episodeRequests.startedAt, new Date(now.getTime() - maxRunningMs))));
+  const pending = await db
+    .select({ id: schema.episodeRequests.id })
+    .from(schema.episodeRequests)
+    .where(and(eq(schema.episodeRequests.status, "pending"), lt(schema.episodeRequests.createdAt, new Date(now.getTime() - maxPendingMs))));
+  const ids = [...running, ...pending].map((r) => r.id);
+  await failRequests(db, ids, STALE_MESSAGE, now);
+  return ids.length;
+}
+
+/**
+ * Poller start-up (it's the only runner without Temporal): anything left
+ * "running" was cut off by a crash or redeploy. Recent ones go back to
+ * "pending" and resume from their stored step outputs; old ones fail, so a
+ * request that keeps crashing the worker can't loop forever.
+ */
+export async function recoverOrphanedRequests(options: { db: Database; now: Date; maxAgeMs?: number }): Promise<{ requeued: number; failed: number }> {
+  const { db, now, maxAgeMs = 2 * 3_600_000 } = options;
+  const cutoff = new Date(now.getTime() - maxAgeMs);
+  const requeued = await db
+    .update(schema.episodeRequests)
+    .set({ status: "pending" })
+    .where(and(eq(schema.episodeRequests.status, "running"), gte(schema.episodeRequests.startedAt, cutoff)))
+    .returning({ id: schema.episodeRequests.id });
+  const old = await db
+    .select({ id: schema.episodeRequests.id })
+    .from(schema.episodeRequests)
+    .where(and(eq(schema.episodeRequests.status, "running"), lt(schema.episodeRequests.startedAt, cutoff)));
+  await failRequests(db, old.map((r) => r.id), STALE_MESSAGE, now);
+  return { requeued: requeued.length, failed: old.length };
 }

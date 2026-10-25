@@ -6,7 +6,8 @@ export async function trackStep<T>(options: {
   db: Database;
   episodeId: string;
   step: PipelineStep;
-  run: () => Promise<T>;
+  /** `progress` stores a small detail (e.g. lines voiced) on the running step for the progress UI. */
+  run: (progress: (detail: Record<string, unknown>) => Promise<void>) => Promise<T>;
   outputRef?: string;
 }): Promise<T> {
   const { db, episodeId, step } = options;
@@ -21,7 +22,14 @@ export async function trackStep<T>(options: {
     .values({ episodeId, step, attempt, status: "running", timings: { startedAt: startedAt.toISOString() } })
     .returning({ id: schema.stepRuns.id });
   try {
-    const result = await options.run();
+    const progress = async (detail: Record<string, unknown>) => {
+      if (!run) return;
+      await db
+        .update(schema.stepRuns)
+        .set({ timings: { startedAt: startedAt.toISOString(), progress: detail } })
+        .where(eq(schema.stepRuns.id, run.id));
+    };
+    const result = await options.run(progress);
     const finishedAt = new Date();
     if (run) {
       await db

@@ -56,7 +56,13 @@ export async function startEpisode(deps: EpisodeDeps, requestId: string): Promis
   const now = nowOf(deps);
   const [request] = await db.select().from(schema.episodeRequests).where(eq(schema.episodeRequests.id, requestId)).limit(1);
   if (!request) throw new Error(`No request ${requestId}`);
-  if (request.episodeId && request.status === "running") return { status: "started", episodeId: request.episodeId };
+  // Retried activity, or a request the poller re-queued after a crash: carry on with the same episode.
+  if (request.episodeId && (request.status === "running" || request.status === "pending")) {
+    if (request.status === "pending") {
+      await db.update(schema.episodeRequests).set({ status: "running", startedAt: now }).where(eq(schema.episodeRequests.id, requestId));
+    }
+    return { status: "started", episodeId: request.episodeId };
+  }
   if (request.status === "done" || request.status === "skipped") {
     return { status: "skipped", message: request.message ?? "Already handled" };
   }
@@ -163,18 +169,31 @@ export async function prepareScript(deps: EpisodeDeps, episodeId: string): Promi
   return { status: "ok" };
 }
 
-async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T, index: number) => Promise<R>): Promise<R[]> {
+/** Run `fn` over `items` with at most `limit` at once; after the first failure no new items start (no paying for clips we'll throw away). */
+export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T, index: number) => Promise<R>): Promise<R[]> {
   const results: R[] = new Array(items.length);
   let next = 0;
+  let failed = false;
   await Promise.all(
     Array.from({ length: Math.max(1, Math.min(limit, items.length)) }, async () => {
-      while (next < items.length) {
+      while (next < items.length && !failed) {
         const index = next++;
-        results[index] = await fn(items[index] as T, index);
+        try {
+          results[index] = await fn(items[index] as T, index);
+        } catch (error) {
+          failed = true;
+          throw error;
+        }
       }
     }),
   );
   return results;
+}
+
+/** A chapter title read aloud: ends with exactly one sentence mark ("Why?" stays "Why?", not "Why?."). */
+export function spokenTitle(title: string): string {
+  const trimmed = title.trim();
+  return /[.!?…]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }
 
 async function loadSfx(deps: EpisodeDeps) {
@@ -205,7 +224,7 @@ export async function voiceEpisode(deps: EpisodeDeps, episodeId: string, heartbe
     episodeId,
     step: "voice",
     outputRef: voiceKey,
-    run: async () => {
+    run: async (progress) => {
       const providerId = episode.voiceProvider ?? "kokoro";
       // Studio quality is a Plus option; trials use Flash (prd §8.3 caps trial cost).
       const ctx = await loadPlanContext({ db, userId: user.id, now: nowOf(deps) });
@@ -215,13 +234,20 @@ export async function voiceEpisode(deps: EpisodeDeps, episodeId: string, heartbe
 
       const texts = [
         ...script.intro.map((l) => l.text),
-        ...script.chapters.flatMap((c) => [`${c.title}.`, ...c.lines.map((l) => l.text)]),
+        ...script.chapters.flatMap((c) => [spokenTitle(c.title), ...c.lines.map((l) => l.text)]),
         ...script.outro.map((l) => l.text),
       ];
       let done = 0;
+      let lastReport = 0;
+      await progress({ done, total: texts.length });
       const clips = await mapLimit(texts, provider.concurrency, async (text, i): Promise<VoiceClip> => {
         const clip = await provider.synthesize({ text, voiceId, previousText: texts[i - 1], nextText: texts[i + 1] });
         heartbeat?.({ done: ++done, total: texts.length });
+        // Throttled: Home polls every few seconds, so one write every ~3 s is plenty.
+        if (Date.now() - lastReport > 3000 || done === texts.length) {
+          lastReport = Date.now();
+          await progress({ done, total: texts.length }).catch(() => undefined);
+        }
         return clip;
       });
 

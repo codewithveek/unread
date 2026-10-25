@@ -8,7 +8,8 @@
   - **Measured:** 6.6 s to generate 8.6 s of speech in this container (about 0.77× real time on one thread). A 10-minute episode is roughly 7.8 CPU-minutes. With `KOKORO_CONCURRENCY=2` on a 2-CPU instance, that's about 4 minutes, which meets "ready within 5 minutes". Measure again on the Render instance.
   - The espeak-ng phonemizer is GPL. Running it on our server isn't distribution; check the licence before ever shipping it inside an app.
 - **Cache:** every line is cached by `sha256(provider | model | voice | text)` in object storage, so retries never pay twice.
-- **Assembly:** ffmpeg, one pass. Lines are joined with 0.28 s pauses, chapters with 0.7 s pauses plus an optional transition SFX, an optional intro and outro sting, `loudnorm=I=-16:TP=-1.5`, MP3 at 96 kbps mono. Chapter and per-line start times come from exact sample counts, so the transcript can highlight the current line.
+- **Assembly:** ffmpeg. Lines are joined with 0.28 s pauses, chapters with 0.7 s pauses plus an optional transition SFX, an optional intro and outro sting, then two-pass `loudnorm=I=-16:TP=-1.5:LRA=11` (measure, then one linear gain, so speech doesn't pump between clips; falls back to single-pass when loudness can't be measured, e.g. silence), MP3 at 96 kbps mono. The MP3 is written to a temp file, not a pipe, so ffmpeg can fill in the Info/Xing header that players use for duration and seeking. Chapter and per-line start times come from exact sample counts, so the transcript can highlight the current line.
+- **Kokoro input length:** kokoro-js tokenises with truncation (~510 phonemes) and silently drops the rest, so the provider splits each line at sentence, then clause, then word boundaries (≤ 220 characters) and joins the pieces with a 0.12 s pause.
 - **Users keep one voice per provider** (`kokoro_voice_id`, `elevenlabs_voice_id`), so a trial ending loses nothing.
 
 ## ElevenLabs (Plus, trials, previews, SFX)

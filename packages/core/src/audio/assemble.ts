@@ -1,4 +1,7 @@
 import { spawn } from "node:child_process";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { SAMPLE_RATE } from "../voice/voice-provider";
 
 export interface AssemblyChapter {
@@ -39,25 +42,96 @@ function concat(parts: Float32Array[]): Float32Array {
   return out;
 }
 
-function runFfmpeg(ffmpegPath: string, args: string[], input: Uint8Array): Promise<Uint8Array> {
+function runFfmpeg(ffmpegPath: string, args: string[], input: Uint8Array): Promise<{ stdout: Uint8Array; stderr: string }> {
   return new Promise((resolve, reject) => {
     const proc = spawn(ffmpegPath, args, { stdio: ["pipe", "pipe", "pipe"] });
     const out: Buffer[] = [];
     let err = "";
     proc.stdout.on("data", (chunk: Buffer) => out.push(chunk));
     proc.stderr.on("data", (chunk: Buffer) => {
-      err = (err + chunk.toString()).slice(-4000);
+      err = (err + chunk.toString()).slice(-8000);
     });
     proc.on("error", reject);
-    proc.on("close", (code) => (code === 0 ? resolve(new Uint8Array(Buffer.concat(out))) : reject(new Error(`ffmpeg exited ${code}: ${err}`))));
+    proc.on("close", (code) =>
+      code === 0 ? resolve({ stdout: new Uint8Array(Buffer.concat(out)), stderr: err }) : reject(new Error(`ffmpeg exited ${code}: ${err.slice(-4000)}`)),
+    );
+    // ffmpeg may exit before reading all input (e.g. on a bad argument); the close handler reports it.
+    proc.stdin.on("error", () => undefined);
     proc.stdin.end(input);
   });
 }
 
 /** Decode any audio file (e.g. an SFX MP3) to 24 kHz mono float PCM. */
 export async function decodeToPcm(ffmpegPath: string, file: Uint8Array): Promise<Float32Array> {
-  const pcm = await runFfmpeg(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", "pipe:0", "-f", "f32le", "-ac", "1", "-ar", String(SAMPLE_RATE), "pipe:1"], file);
-  return new Float32Array(pcm.buffer, pcm.byteOffset, pcm.byteLength / 4);
+  const { stdout: pcm } = await runFfmpeg(ffmpegPath, ["-hide_banner", "-loglevel", "error", "-i", "pipe:0", "-f", "f32le", "-ac", "1", "-ar", String(SAMPLE_RATE), "pipe:1"], file);
+  return new Float32Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.byteLength / 4));
+}
+
+const LOUDNESS = "I=-16:TP=-1.5:LRA=11";
+const PCM_INPUT = ["-f", "f32le", "-ar", String(SAMPLE_RATE), "-ac", "1", "-i", "pipe:0"];
+
+interface LoudnessMeasurement {
+  input_i: string;
+  input_tp: string;
+  input_lra: string;
+  input_thresh: string;
+  target_offset: string;
+}
+
+/** Pass 1 of loudnorm: measure the whole episode, so pass 2 can apply one steady (linear) gain. */
+async function measureLoudness(ffmpegPath: string, pcm: Uint8Array): Promise<LoudnessMeasurement | null> {
+  const { stderr } = await runFfmpeg(
+    ffmpegPath,
+    ["-hide_banner", "-nostats", "-loglevel", "info", ...PCM_INPUT, "-af", `loudnorm=${LOUDNESS}:print_format=json`, "-f", "null", "-"],
+    pcm,
+  );
+  const json = stderr.slice(stderr.lastIndexOf("{"), stderr.lastIndexOf("}") + 1);
+  try {
+    const parsed = JSON.parse(json) as Partial<LoudnessMeasurement>;
+    const values = [parsed.input_i, parsed.input_tp, parsed.input_lra, parsed.input_thresh, parsed.target_offset];
+    // Silence measures as -inf; fall back to single-pass then.
+    if (values.some((v) => v === undefined || !Number.isFinite(Number(v)))) return null;
+    return parsed as LoudnessMeasurement;
+  } catch {
+    return null;
+  }
+}
+
+/** Encode PCM to MP3 into a temp file, so ffmpeg can write a correct Xing/Info header (duration, seeking). */
+async function encodeMp3(options: { ffmpegPath: string; pcm: Uint8Array; filter: string; title: string }): Promise<Uint8Array> {
+  const dir = await mkdtemp(join(tmpdir(), "unread-mp3-"));
+  const file = join(dir, "episode.mp3");
+  try {
+    await runFfmpeg(
+      options.ffmpegPath,
+      [
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        ...PCM_INPUT,
+        "-af",
+        options.filter,
+        "-ar",
+        "44100",
+        "-ac",
+        "1",
+        "-c:a",
+        "libmp3lame",
+        "-b:a",
+        "96k",
+        "-metadata",
+        `title=${options.title}`,
+        "-metadata",
+        "artist=Unread",
+        "-y",
+        file,
+      ],
+      options.pcm,
+    );
+    return new Uint8Array(await readFile(file));
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 }
 
 /**
@@ -103,39 +177,11 @@ export async function assembleEpisode(options: {
   if (sfx.outro) push(sfx.outro);
 
   const pcm = concat(parts);
-  const mp3 = await runFfmpeg(
-    options.ffmpegPath,
-    [
-      "-hide_banner",
-      "-loglevel",
-      "error",
-      "-f",
-      "f32le",
-      "-ar",
-      String(SAMPLE_RATE),
-      "-ac",
-      "1",
-      "-i",
-      "pipe:0",
-      "-af",
-      "loudnorm=I=-16:TP=-1.5:LRA=11",
-      "-ar",
-      "44100",
-      "-ac",
-      "1",
-      "-c:a",
-      "libmp3lame",
-      "-b:a",
-      "96k",
-      "-metadata",
-      `title=${options.title}`,
-      "-metadata",
-      "artist=Unread",
-      "-f",
-      "mp3",
-      "pipe:1",
-    ],
-    new Uint8Array(pcm.buffer),
-  );
+  const bytes = new Uint8Array(pcm.buffer);
+  const measured = await measureLoudness(options.ffmpegPath, bytes);
+  const filter = measured
+    ? `loudnorm=${LOUDNESS}:measured_I=${measured.input_i}:measured_TP=${measured.input_tp}:measured_LRA=${measured.input_lra}:measured_thresh=${measured.input_thresh}:offset=${measured.target_offset}:linear=true`
+    : `loudnorm=${LOUDNESS}`;
+  const mp3 = await encodeMp3({ ffmpegPath: options.ffmpegPath, pcm: bytes, filter, title: options.title });
   return { mp3, durationS: pcm.length / SAMPLE_RATE, chapters, introLineStarts, outroLineStarts };
 }

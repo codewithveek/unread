@@ -2,11 +2,12 @@
 
 import { cn } from "@/lib/utils";
 import { clock, remaining } from "./format";
-import { usePlayer } from "./player-context";
+import { usePlayer, usePlayerTime } from "./player-context";
 
 /** Seekable progress with chapter marks (canvas Now playing). A native range input keeps it accessible. */
 export function ProgressBar({ className, showTimes = true }: { className?: string; showTimes?: boolean }) {
-  const { episode, currentTime, duration, seek } = usePlayer();
+  const { episode, seek } = usePlayer();
+  const { currentTime, duration } = usePlayerTime();
   if (!episode) return null;
   const pct = duration ? Math.min(100, (currentTime / duration) * 100) : 0;
   return (

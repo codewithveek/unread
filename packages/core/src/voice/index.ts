@@ -8,6 +8,7 @@ export * from "./cache";
 export * from "./elevenlabs";
 export * from "./pcm";
 export * from "./kokoro";
+export * from "./split-text";
 export * from "./voice-provider";
 export * from "./voices";
 

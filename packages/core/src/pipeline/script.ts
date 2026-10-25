@@ -11,7 +11,25 @@ Rules:
 - Every line lists the ids of the sources it relies on, e.g. ["S1"].
 - At most 30 words per line.
 - If several sources cover the story, say so once, e.g. "Morning Brew and The Hustle both covered this."
-- Don't greet the listener or sign off; the episode has its own intro and outro.`;
+- Don't greet the listener or sign off; the episode has its own intro and outro.
+- The title is a short headline in your own words: no reading times, "Sponsored", emoji or source names.`;
+
+const CLUTTER = [
+  // "(6 minute read)", "[5 min]", "(3-min listen)"
+  /\s*[([]\s*\d+\s*[-\s]?(?:minutes?|mins?)\.?(?:\s+(?:read|listen|watch))?\s*[)\]]/gi,
+  // "(Sponsored)", "[Ad]"
+  /\s*[([]\s*(?:sponsored|sponsor|ad|partner|paid)\s*[)\]]/gi,
+  // "Sponsored: …", "Together with Acme — …"
+  /^\s*(?:sponsored|together with [^:—|-]+)\s*[:|—-]\s*/i,
+  // "… | 4 min read"
+  /\s*[|·—-]\s*\d+\s*(?:minutes?|mins?)\s+read\s*$/i,
+];
+
+/** Newsletter headline clutter ("(6 minute read)", "(Sponsored)") that shouldn't be read aloud or shown. */
+export function cleanHeadline(title: string): string {
+  const cleaned = CLUTTER.reduce((t, pattern) => t.replace(pattern, ""), title).replace(/\s{2,}/g, " ").trim();
+  return cleaned || title.trim();
+}
 
 function sourceBlock(cluster: Cluster): { text: string; idMap: Map<string, string> } {
   const idMap = new Map<string, string>();
@@ -58,13 +76,13 @@ export async function writeChapter(options: {
   });
   return {
     clusterKey: cluster.key,
-    title: draft.title,
+    title: cleanHeadline(draft.title),
     origin: originLabel(cluster),
     lines: draft.lines.map((l) => ({ text: l.text, sourceIds: l.sourceIds.map((s) => idMap.get(s) ?? s) })),
     sources: cluster.items.map((item, i) => ({
       itemId: item.id,
       label: item.sourceLabel,
-      title: item.title,
+      title: cleanHeadline(item.title),
       url: item.url ?? item.links[0]?.url ?? null,
       role: i === 0 ? ("primary" as const) : ("also" as const),
     })),

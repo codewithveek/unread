@@ -80,3 +80,20 @@ export function Forward15Icon(props: P) {
     </svg>
   );
 }
+
+export function SpinnerIcon(props: P) {
+  return (
+    <svg {...base} {...stroke} {...props}>
+      <path d="M12 3a9 9 0 1 0 9 9" />
+    </svg>
+  );
+}
+
+export function RetryIcon(props: P) {
+  return (
+    <svg {...base} {...stroke} {...props}>
+      <path d="M4 12a8 8 0 1 0 2.3-5.7" />
+      <path d="M4 4v4h4" />
+    </svg>
+  );
+}

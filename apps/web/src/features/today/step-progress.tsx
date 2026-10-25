@@ -4,11 +4,13 @@ import { PIPELINE_STEP_LABELS, PIPELINE_STEPS, type StepState } from "./pipeline
 
 export interface StepProgressProps {
   states?: Partial<Record<PipelineStep, StepState>>;
+  /** Extra text for a step, e.g. "23 of 61 lines" while voicing. */
+  details?: Partial<Record<PipelineStep, string>>;
   className?: string;
 }
 
 /** The step list shown while an episode is being made. */
-export function StepProgress({ states = {}, className }: StepProgressProps) {
+export function StepProgress({ states = {}, details = {}, className }: StepProgressProps) {
   return (
     <ol className={cn("m-0 flex list-none flex-col p-0", className)}>
       {PIPELINE_STEPS.map((step, index) => {
@@ -29,6 +31,9 @@ export function StepProgress({ states = {}, className }: StepProgressProps) {
             <span className={cn("text-sm", state === "pending" ? "text-muted-foreground" : "text-foreground")}>
               {PIPELINE_STEP_LABELS[step]}
             </span>
+            {state === "active" && details[step] ? (
+              <span className="ml-auto font-mono text-xs text-muted-foreground">{details[step]}</span>
+            ) : null}
             <span className="sr-only">{state}</span>
           </li>
         );

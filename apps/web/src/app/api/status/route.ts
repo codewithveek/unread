@@ -10,7 +10,7 @@ export async function GET() {
   if (!current) return Response.json({ error: "Sign in" }, { status: 401 });
   const [inbound, home] = await Promise.all([inboundStatus(current.user.id), loadHome(current.user.id, current.user.feedToken)]);
   return Response.json(
-    { inbound, episode: { inProgress: home.inProgress, failure: home.failure, latestId: home.latest?.id ?? null } },
+    { inbound, episode: { inProgress: home.inProgress, notice: home.notice, latestId: home.latest?.id ?? null } },
     { headers: { "cache-control": "no-store" } },
   );
 }

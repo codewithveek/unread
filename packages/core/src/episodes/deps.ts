@@ -13,4 +13,13 @@ export interface EpisodeDeps {
   embedder: Embedder;
   voiceFor: (id: VoiceProviderId, options?: { quality?: ElevenLabsQuality }) => VoiceProvider;
   now?: () => Date;
+  /** Per-step retries in `makeEpisode` (poller/CLI); Temporal has its own retry policy. */
+  retry?: RetryOptions;
+}
+
+export interface RetryOptions {
+  /** Tries per step, including the first (default 3). */
+  attempts?: number;
+  /** Wait before the first retry; doubles each time (default 5 s). */
+  initialDelayMs?: number;
 }

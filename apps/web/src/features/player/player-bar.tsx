@@ -1,7 +1,7 @@
 "use client";
 
 import { Back15Icon, Forward15Icon } from "./icons";
-import { TransportControls } from "./controls";
+import { PlayerError, TransportControls } from "./controls";
 import { usePlayer } from "./player-context";
 import { ProgressBar } from "./progress-bar";
 
@@ -37,6 +37,7 @@ export function PlayerBar() {
         </div>
         <ProgressBar className="min-w-0" />
       </div>
+      <PlayerError className="pb-2" />
     </div>
   );
 }

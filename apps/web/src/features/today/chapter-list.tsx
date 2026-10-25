@@ -2,6 +2,7 @@
 
 import type { PlayerEpisode } from "@/features/episodes/queries";
 import { clock } from "@/features/player/format";
+import { PlayIcon } from "@/features/player/icons";
 import { usePlayer } from "@/features/player/player-context";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,14 @@ export function ChapterList({ episode }: { episode: PlayerEpisode }) {
     if (window.matchMedia("(min-width: 1024px)").matches) return;
     player.load(episode, { autoplay: true, startAt: chapter.startS });
     player.setExpanded(true);
+  };
+
+  /** Desktop: rows open the transcript, so playing a chapter gets its own button. */
+  const playFrom = (index: number) => {
+    const chapter = episode.transcript.chapters[index];
+    if (!chapter) return;
+    player.focusChapter(index);
+    player.load(episode, { autoplay: true, startAt: chapter.startS });
   };
 
   return (
@@ -41,13 +50,13 @@ export function ChapterList({ episode }: { episode: PlayerEpisode }) {
           const playing = isCurrent && player.chapterIndex === index;
           const focused = player.focusedChapter === index;
           return (
-            <li key={`${index}-${chapter.startS}`}>
+            <li key={`${index}-${chapter.startS}`} className="flex items-start">
               <button
                 type="button"
                 onClick={() => open(index)}
                 aria-current={playing ? "true" : undefined}
                 className={cn(
-                  "flex w-full cursor-pointer items-start gap-3 border-b border-surface-2 py-3 text-left lg:rounded-lg lg:px-2",
+                  "flex min-w-0 flex-1 cursor-pointer items-start gap-3 border-b border-surface-2 py-3 text-left lg:rounded-lg lg:px-2",
                   focused && "lg:bg-surface",
                 )}
               >
@@ -57,6 +66,14 @@ export function ChapterList({ episode }: { episode: PlayerEpisode }) {
                   <span className="text-xs text-muted-foreground">{chapter.origin}</span>
                 </span>
                 {playing ? <span aria-label="Playing" className="mt-[7px] size-2 flex-none rounded-full bg-brand" /> : null}
+              </button>
+              <button
+                type="button"
+                onClick={() => playFrom(index)}
+                aria-label={`Play from ${chapter.title}`}
+                className="hidden size-11 flex-none cursor-pointer items-center justify-center self-center text-text-2 hover:text-foreground lg:flex"
+              >
+                <PlayIcon className="size-4" />
               </button>
             </li>
           );

@@ -1,6 +1,6 @@
 # Unread · project memory (handoff)
 
-Living state of the project for new sessions. Update it when milestones, decisions or blockers change. Last updated 2026-10-24.
+Living state of the project for new sessions. Update it when milestones, decisions or blockers change. Last updated 2026-10-25.
 
 ## What it is
 Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, cited podcast episode → private RSS feed + web player. DEV Hacktoberfest 2026 Week 3 entry; deadline **Mon Oct 26, 07:59 WAT**. Owner: Lucky Victory (@CodewithVeek), repo `codewithveek/unread`, working branch `claude/gifted-albattani-gk5mjz`. Spec: `docs/prd-unread.md` (v2 + Kokoro/Bachs/promo/trial-limit updates). The canvas phone designs in `docs/design/` are the UI source of truth.
@@ -59,6 +59,7 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 5. Measure Kokoro speed on the Render instance; tune `KOKORO_CONCURRENCY`.
 6. Landing page `/` follows `docs/design/Landing.dc.html` (`features/landing/`). Still placeholders: `PLUS_PRICE` (`[PRICE]`), the sample audio `public/sample-episode.mp3` (not made yet; the player shows "coming soon" when it is missing; chapter `startSeconds` must match it), and there is no Terms page, so the footer leaves out that link.
 7. PRD inconsistencies resolved by assumption: Free voices 4 (§8) not 3 (§9); Free cap = 4 episodes/month; `/inbound/email` writes `items` (not `saved_items`).
+8. Robustness pass (2026-10-25, branch `fix/robustness-ux`): poller re-queues orphaned "running" requests on start-up and retries each step 3× (`deps.retry`); hourly maintenance fails requests running > 2 h or pending > 6 h (`failStaleRequests`); failed manual requests don't count toward the daily limit; Home shows skipped runs, voice progress ("23 of 61 lines") and a "taking longer than usual" note after 15 min. Player: load/buffer/error states with one silent retry, rate persisted (`defaultPlaybackRate`), resume applied on `loadedmetadata`, Media Session position state, time in its own context (`usePlayerTime`). Kokoro lines are split before synthesis (kokoro-js truncates); two-pass loudnorm; MP3 encoded to a temp file. Not yet verified in a real browser against a deployed worker.
 
 ## Working with this user
 - Wants autonomous end-to-end building ("build everything start to finish"), short progress updates, and honest status (what's verified vs not).

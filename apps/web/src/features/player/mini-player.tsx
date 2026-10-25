@@ -1,11 +1,12 @@
 "use client";
 
 import { PlayPauseButton } from "./controls";
-import { usePlayer } from "./player-context";
+import { usePlayer, usePlayerTime } from "./player-context";
 
 /** Compact bar above the tab bar (phone/tablet); tap to open Now playing. */
 export function MiniPlayer() {
-  const { episode, chapterIndex, setExpanded, currentTime, duration } = usePlayer();
+  const { episode, chapterIndex, setExpanded, status } = usePlayer();
+  const { currentTime, duration } = usePlayerTime();
   if (!episode) return null;
   const chapter = chapterIndex !== null ? episode.transcript.chapters[chapterIndex] : null;
   const pct = duration ? (currentTime / duration) * 100 : 0;
@@ -17,7 +18,9 @@ export function MiniPlayer() {
           <img src={episode.coverUrl} alt="" className="size-11 flex-none rounded-lg object-cover" />
           <span className="flex min-w-0 flex-col">
             <span className="truncate text-sm font-medium">{chapter?.title ?? episode.title}</span>
-            <span className="truncate text-xs text-muted-foreground">{chapter?.origin ?? "Unread"}</span>
+            <span className="truncate text-xs text-muted-foreground">
+              {status === "error" ? "Couldn't load the audio. Tap play to retry" : (chapter?.origin ?? "Unread")}
+            </span>
           </span>
         </button>
         <PlayPauseButton size="sm" />

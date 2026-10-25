@@ -3,7 +3,8 @@
 import type { PlayerEpisode } from "@/features/episodes/queries";
 import { clock, minutesLabel, remaining } from "@/features/player/format";
 import { PauseIcon, PlayIcon } from "@/features/player/icons";
-import { usePlayer } from "@/features/player/player-context";
+import { storedPosition, usePlayer, usePlayerTime, wasPlayed } from "@/features/player/player-context";
+import { useBrowserValue } from "@/lib/use-browser-value";
 import { EpisodeCover } from "./episode-cover";
 
 export interface EpisodeCardProps {
@@ -23,11 +24,15 @@ function storiesLine(title: string): string {
 /** Home's episode card (canvas screen 2): cover, what's in it, big play button, progress. */
 export function EpisodeCard({ episode, madeAt, sourceCount, trialNote, cover }: EpisodeCardProps) {
   const player = usePlayer();
+  const playerTime = usePlayerTime();
+  const saved = useBrowserValue(() => storedPosition(episode.id), 0);
+  const played = useBrowserValue(() => wasPlayed(episode.id), false);
   const isCurrent = player.episode?.id === episode.id;
   const playing = isCurrent && player.playing;
-  const time = isCurrent ? player.currentTime : 0;
-  const duration = isCurrent ? player.duration : episode.durationS;
+  const time = isCurrent ? playerTime.currentTime : saved;
+  const duration = isCurrent ? playerTime.duration : episode.durationS;
   const pct = duration ? (time / duration) * 100 : 0;
+  const resumable = !isCurrent && saved > 0 && saved < episode.durationS - 5;
 
   const onPlay = () => {
     if (isCurrent) player.toggle();
@@ -49,7 +54,7 @@ export function EpisodeCard({ episode, madeAt, sourceCount, trialNote, cover }: 
           <button
             type="button"
             onClick={onPlay}
-            aria-label={playing ? "Pause episode" : "Play today's episode"}
+            aria-label={playing ? "Pause episode" : resumable ? `Resume today's episode from ${clock(saved)}` : "Play today's episode"}
             className="flex size-14 flex-none cursor-pointer items-center justify-center rounded-full bg-brand text-on-brand"
           >
             {playing ? <PauseIcon className="size-[22px]" /> : <PlayIcon className="size-[22px]" />}
@@ -64,6 +69,8 @@ export function EpisodeCard({ episode, madeAt, sourceCount, trialNote, cover }: 
             </div>
           </div>
         </div>
+        {resumable ? <p className="m-0 text-[13px] text-text-2">Resume from {clock(saved)}</p> : null}
+        {!isCurrent && !resumable && played ? <p className="m-0 text-[13px] text-text-2">Played. Tap play to listen again.</p> : null}
         {trialNote ? <p className="m-0 text-[13px] text-text-2">{trialNote}</p> : null}
       </div>
     </section>
