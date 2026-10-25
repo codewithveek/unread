@@ -43,6 +43,7 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 ## Environment facts (user's Windows machine)
 - `apps/web/.env.local` exists (made from `.env.example` on 2026-10-25): `AUTH0_SECRET` and `INBOUND_WEBHOOK_SECRET` generated, storage/model dirs under `%LOCALAPPDATA%/unread`. Provider keys still blank.
 - Local Postgres runs in Docker: container `unread-postgres` (`pgvector/pgvector:pg16`, volume `unread-pgdata`, port 5432, user/password `unread`), databases `unread` and `unread_test`, both migrated. No Timescale, so `listening_events` is a plain table here. Docker Desktop must be running.
+- Models cache in `%TEMP%/unread-models`. Hugging Face downloads here often reset (`ECONNRESET`) and transformers.js can't resume, which leaves truncated `.onnx_data` files ("out of bounds" on load). Fix: delete the partial folder and fetch with `curl -L -C - --retry 5 -o <cache>/<repo>/<path> https://huggingface.co/<repo>/resolve/main/<path>` (EmbeddingGemma `onnx/model_quantized.onnx` + `.onnx_data` 308,890,624 bytes; Kokoro `config.json`, `tokenizer.json`, `tokenizer_config.json`, `onnx/model_quantized.onnx` 92,361,116 bytes). With models cached, the full integration suite passes (2026-10-26).
 - Disk C: is nearly full (~5 GB free after clearing npm/pnpm caches on 2026-10-24); Docker data (~35 GB) is the big item, left for the user.
 
 ## How to verify things
