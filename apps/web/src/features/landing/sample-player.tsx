@@ -33,7 +33,16 @@ export function SampleAudioProvider({ children }: { children: ReactNode }) {
   const [unavailable, setUnavailable] = useState(false);
 
   const play = () => {
-    audioRef.current?.play().catch(() => setPlaying(false));
+    audioRef.current?.play().catch(() => {
+      setPlaying(false);
+      if (audioRef.current?.error) setUnavailable(true);
+    });
+  };
+
+  // The file can fail before hydration attaches onError, so check once on mount too.
+  const attachAudio = (audio: HTMLAudioElement | null) => {
+    audioRef.current = audio;
+    if (audio?.error) setUnavailable(true);
   };
 
   const value: SampleAudio = {
@@ -59,7 +68,7 @@ export function SampleAudioProvider({ children }: { children: ReactNode }) {
     <SampleAudioContext.Provider value={value}>
       {children}
       <audio
-        ref={audioRef}
+        ref={attachAudio}
         src={SAMPLE_EPISODE.src}
         preload="metadata"
         onLoadedMetadata={(e) => {

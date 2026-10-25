@@ -40,6 +40,11 @@ Forward newsletters to `<alias>@in.getunread.site` → one short, deduplicated, 
 - Docker works (`dockerd` may need starting). Building the worker image here needs the proxy CA copied in (test-only variant); the committed Dockerfile is for Render.
 - Models cache in `$TMPDIR/unread-models` (Kokoro ~0.77× real time on CPU; EmbeddingGemma loads in ~5 s).
 
+## Environment facts (user's Windows machine)
+- `apps/web/.env.local` exists (made from `.env.example` on 2026-10-25): `AUTH0_SECRET` and `INBOUND_WEBHOOK_SECRET` generated, storage/model dirs under `%LOCALAPPDATA%/unread`. Provider keys still blank.
+- Local Postgres runs in Docker: container `unread-postgres` (`pgvector/pgvector:pg16`, volume `unread-pgdata`, port 5432, user/password `unread`), databases `unread` and `unread_test`, both migrated. No Timescale, so `listening_events` is a plain table here. Docker Desktop must be running.
+- Disk C: is nearly full (~5 GB free after clearing npm/pnpm caches on 2026-10-24); Docker data (~35 GB) is the big item, left for the user.
+
 ## How to verify things
 - Fast: `pnpm typecheck && pnpm lint && pnpm test`.
 - Integration: `TEST_DATABASE_URL=postgres://unread:unread@localhost:5432/unread_test RUN_EMBEDDING_TESTS=1 RUN_TEMPORAL_TESTS=1 pnpm test` (real EmbeddingGemma, Kokoro, ffmpeg, Temporal time-skipping).

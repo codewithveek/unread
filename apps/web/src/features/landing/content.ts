@@ -5,7 +5,7 @@ export const SIGN_UP_HREF = "/auth/login?screen_hint=signup&returnTo=/today";
 export const SIGN_IN_HREF = "/auth/login?returnTo=/today";
 
 /** Placeholder in the design; the real price lives in Bachs. Replace before launch. */
-export const PLUS_PRICE = "[PRICE]";
+export const PLUS_PRICE = "";
 
 /** Sample episode played by the hero card and the chapter buttons. Drop the file into apps/web/public. */
 export const SAMPLE_EPISODE = {
