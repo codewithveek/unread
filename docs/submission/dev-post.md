@@ -47,6 +47,8 @@ I am not too lazy to listen, though. I have a 40-minute commute to the office an
 
 ![Now playing: the line being spoken is highlighted, and every source is one tap away](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/now-playing.jpg)
 
+![Studio voices: pick any voice from the ElevenLabs library, each with its own preview](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/voices.jpg)
+
 ## Code
 
 {% github codewithveek/unread %}
