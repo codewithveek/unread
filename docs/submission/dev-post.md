@@ -2,20 +2,20 @@
 title: I had 124 unread newsletters. Now they read themselves to me on my commute
 published: false
 tags: devchallenge, hf26challenge, ai, opensource
-cover_image: https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/cover.jpg
+cover_image: https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/cover.jpg
 ---
 
 *This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 3: Slow and Steady](https://dev.to/challenges/hacktoberfest-week3-2026-10-19)*
 
-My inbox has 124 unread newsletters. I subscribed to every one of them on purpose. Neo Kim's *System Design Newsletter* teaches me something every week, and Gregor Ojstersek's *Engineering Leadership* is the closest thing I have to a mentor. They're important. I'm just too lazy to read them.
+My inbox has 124 unread newsletters. I subscribed to every one of them on purpose. Neo Kim's *System Design Newsletter* teaches me something every day, and Gregor Ojstersek's *Engineering Leadership* is the closest thing I have to a mentor. They're important. I'm just too lazy to read them.
 
-I am not too lazy to listen, though. I have a 40-minute commute to the office and my ears are free the whole way. So I built **Unread**: forward your newsletters to a private address, and Unread turns them into one short podcast episode, with every story heard once, every claim cited, delivered to the podcast app you already use.
+I am not too lazy to listen, though. I have a 40-minute commute to the office and my ears are free the whole way. So I built **Unread**: It picks up your newsletters to a private address, and turns them into one short podcast episode, with every story heard once, every claim cited.
 
 ## What I Built
 
-**[Unread](https://getunread.site)** turns the newsletters you never get round to into a short, private podcast.
+**[Unread](https://getunread.site)** turns the newsletters you never get to read into a short, private podcast.
 
-1. **Forward once.** You get a private address like `k7m2q9x4ab@in.getunread.site`. Add one Gmail filter that forwards your newsletters to it. Gmail sends a confirmation code first, so Unread catches that email and shows the code in the app. You never dig through a hidden inbox to find it. After that you never touch it again.
+1. **Forward once.** You get a private address like `k7m2q9x4ab@in.getunread.site`. Add one Gmail filter that forwards your newsletters to it. Gmail sends a confirmation code first, so Unread catches that email and shows the code in the app. After that you never touch it again.
 2. **Unread does the reading.** Every issue is cleaned (footers, unsubscribe blocks, tracking pixels and sponsor sections removed) and split into separate stories.
 3. **You hear each story once.** This is the part I care about most, and it's really two features:
    - **The same story from several newsletters becomes one chapter that credits all of them.** When two newsletters cover the same launch in the same week, you hear it once: *"Engineering Leadership and The System Design Newsletter both covered this."*
@@ -23,7 +23,7 @@ I am not too lazy to listen, though. I have a 40-minute commute to the office an
 4. **Nothing is made up.** Every line of the script must cite the newsletter it came from. Any number or quote that isn't in that source is rewritten once, and cut if it still fails. Every chapter lists its sources, with links.
 5. **It plays where you already listen.** Each episode has chapters, a transcript that highlights the line being spoken, and the sources. Episodes go to a private RSS feed that works in any podcast app that accepts a feed URL (the Sources page has one-tap buttons for Apple Podcasts and Pocket Casts), and to a web player on phone and desktop.
 
-**Who gets to be lazier?** Anyone with 5 to 30 newsletter subscriptions and a commute, a gym session or a pile of dishes. After two minutes of setup, the effort is zero. No app to open, no "read later" queue to feel guilty about, no reading the same funding round four times.
+**Who gets to be lazier?** Anyone with multiple newsletter subscriptions and a commute, a gym session or a pile of dishes. After two minutes of setup, the effort is zero. No app to open, no "read later" queue to feel guilty about, no reading the same funding round four times.
 
 **Slow and steady, on purpose.** The Free plan makes one episode a week, voiced by an open-weight model on a CPU. A 10-minute episode takes the worker a few minutes to record, and nobody minds, because it's made on a schedule while you sleep. It only runs when there's something new: fewer than two new stories means no episode and no cost.
 
@@ -31,23 +31,21 @@ I am not too lazy to listen, though. I have a 40-minute commute to the office an
 
 **Live:** [getunread.site](https://getunread.site). Sign in, copy your forwarding address, and forward one newsletter by hand to try it.
 
-{% embed ✏️ YOUTUBE_URL_OF_THE_DEMO_VIDEO %}
+{% embed ✏️ https://youtu.be/RVmLeH0rQ_0 %}
 
 *The video's narrator and the episode's host are both ElevenLabs voices. The screens are rebuilt from the app's own components and strings.*
 
-![My Gmail inbox: newsletter after newsletter, unread](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/inbox.jpg)
+![My Gmail inbox: newsletter after newsletter, unread](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/inbox.jpg)
 
-![Forwarding setup: the private address, and Gmail's confirmation code caught and shown in the app](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/gmail-code.jpg)
+![Forwarding setup: the private address, and Gmail's confirmation code caught and shown in the app](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/gmail-code.jpg)
 
-![Two newsletters, one story: Gemma 4 confirms the borderline pair](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/gemma-confirms.jpg)
+![Two newsletters, one story: Gemma 4 confirms the borderline pair](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/gemma-confirms.jpg)
 
-![The merged chapter credits both newsletters](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/one-chapter.jpg)
+![The merged chapter credits both newsletters](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/one-chapter.jpg)
 
-![The fact check: a number that isn't in the cited source gets cut](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/fact-check.jpg)
+![The fact check: a number that isn't in the cited source gets cut](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/fact-check.jpg)
 
-![Now playing: the line being spoken is highlighted, and every source is one tap away](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/now-playing.jpg)
-
-![Studio voices: pick any voice from the ElevenLabs library, each with its own preview](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/voices.jpg)
+![Now playing: the line being spoken is highlighted, and every source is one tap away](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/now-playing.jpg)
 
 ## Code
 
@@ -61,7 +59,7 @@ I am not too lazy to listen, though. I have a 40-minute commute to the office an
 | `packages/core` | All the logic: email parsing, clustering, planning, scripting, fact check, voices, audio, cover, RSS feed, plans, promo codes |
 | `packages/db` | Drizzle schema and migrations: Postgres with pgvector and a Timescale hypertable |
 
-Unread is MIT-licensed. The repo was started on October 23, inside the challenge window. Every third-party choice is written up as a decision record in [`docs/decisions/`](https://github.com/codewithveek/unread/tree/main/docs/decisions), and the product spec is in [`docs/prd-unread.md`](https://github.com/codewithveek/unread/blob/main/docs/prd-unread.md). Integration tests run against real EmbeddingGemma, real Kokoro, real ffmpeg and Temporal's time-skipping test server, not mocks.
+The repo was started on October 23, inside the challenge window. Every third-party choice is written up as a decision record in [`docs/decisions/`](https://github.com/codewithveek/unread/tree/main/docs/decisions), and the product spec is in [`docs/prd-unread.md`](https://github.com/codewithveek/unread/blob/main/docs/prd-unread.md). Integration tests run against real EmbeddingGemma, real Kokoro, real ffmpeg and Temporal's time-skipping test server, not mocks.
 
 ## How I Built It
 
@@ -73,7 +71,7 @@ Unread is MIT-licensed. The repo was started on October 23, inside the challenge
 | **EmbeddingGemma 300M** (`onnx-community/embeddinggemma-300m-ONNX`, q8) | Gemma open weights | Turns every story into a 768-dimension vector, to find the same story across newsletters and stories you've already heard | **On our own worker's CPU**, through transformers.js 3.8.1 (ONNX Runtime) |
 | **Kokoro-82M** (`onnx-community/Kokoro-82M-v1.0-ONNX`, q8) | Apache-2.0 | Reads every Free episode aloud, in four curated voices | **On our own worker's CPU**, through kokoro-js |
 
-Around them it's open source all the way down: Postgres with **pgvector** and **TimescaleDB**, **Temporal** (MIT), **ffmpeg**, Mozilla's **Readability**, **resvg** for covers, and Next.js.
+Around them it's open source all the way down: Postgres with **pgvector** from **Tiger Data**, **Temporal**, **ffmpeg**, Mozilla's **Readability**, **resvg** for covers, and Next.js.
 
 ### The pipeline
 
@@ -189,8 +187,8 @@ I built Unread with an AI coding agent, spec first: a product spec ([`docs/prd-u
 ## The Lazy Payoff
 
 - **Setup:** one Gmail filter, once. About two minutes.
-- **Last week in my inbox:** 6 new issues from two newsletters between Oct 19 and Oct 23. Four came from Neo Kim, on networking and AI engineering, and two from Gregor, on using AI at work and communicating your impact. At their own read times, that's ✏️ *[about N] minutes of reading* I was never going to do.
-- **What Unread made from it:** ✏️ *[one N-minute episode, M chapters, K stories merged/skipped]*, heard on the way to the office.
+- **Last week in my inbox:** 6 new issues from two newsletters between Oct 19 and Oct 23. Four came from Neo Kim, on networking and AI engineering, and two from Gregor, on using AI at work and communicating your impact. At their own read times, that's ✏️ 55 minutes of reading I was never going to do.
+- **What Unread made from it:** ✏️ *one 10-minute episode, 6 chapters*, heard on the way to the office.
 - **Effort after setup:** zero. The filter forwards, the schedule makes the episode, and my podcast app downloads it.
 - **What it costs to make:** $0 in voice on Free (CPU time only); about 36 cents for a 10-minute episode on ElevenLabs Flash.
 
