@@ -2,7 +2,7 @@
 title: I had 124 unread newsletters. Now they read themselves to me on my commute
 published: false
 tags: devchallenge, hf26challenge, ai, opensource
-cover_image: https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/cover.jpg
+cover_image: https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/cover.jpg
 ---
 
 *This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 3: Slow and Steady](https://dev.to/challenges/hacktoberfest-week3-2026-10-19)*
@@ -35,19 +35,19 @@ I am not too lazy to listen, though. I have a 40-minute commute to the office an
 
 *The video's narrator and the episode's host are both ElevenLabs voices. The screens are rebuilt from the app's own components and strings.*
 
-![My Gmail inbox: newsletter after newsletter, unread](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/inbox.jpg)
+![My Gmail inbox: newsletter after newsletter, unread](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/inbox.jpg)
 
-![Forwarding setup: the private address, and Gmail's confirmation code caught and shown in the app](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/gmail-code.jpg)
+![Forwarding setup: the private address, and Gmail's confirmation code caught and shown in the app](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/gmail-code.jpg)
 
-![Two newsletters, one story: Gemma 4 confirms the borderline pair](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/gemma-confirms.jpg)
+![Two newsletters, one story: Gemma 4 confirms the borderline pair](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/gemma-confirms.jpg)
 
-![The merged chapter credits both newsletters](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/one-chapter.jpg)
+![The merged chapter credits both newsletters](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/one-chapter.jpg)
 
-![The fact check: a number that isn't in the cited source gets cut](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/fact-check.jpg)
+![The fact check: a number that isn't in the cited source gets cut](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/fact-check.jpg)
 
-![Now playing: the line being spoken is highlighted, and every source is one tap away](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/now-playing.jpg)
+![Now playing: the line being spoken is highlighted, and every source is one tap away](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/now-playing.jpg)
 
-![Studio voices: pick any voice from the ElevenLabs library, each with its own preview](https://raw.githubusercontent.com/codewithveek/unread/claude/nifty-galileo-tinqrd/docs/submission/voices.jpg)
+![Studio voices: pick any voice from the ElevenLabs library, each with its own preview](https://raw.githubusercontent.com/codewithveek/unread/main/docs/submission/voices.jpg)
 
 ## Code
 
@@ -61,7 +61,7 @@ I am not too lazy to listen, though. I have a 40-minute commute to the office an
 | `packages/core` | All the logic: email parsing, clustering, planning, scripting, fact check, voices, audio, cover, RSS feed, plans, promo codes |
 | `packages/db` | Drizzle schema and migrations: Postgres with pgvector and a Timescale hypertable |
 
-The repo was started on October 23, inside the challenge window. Every third-party choice is written up as a decision record in [`docs/decisions/`](https://github.com/codewithveek/unread/tree/main/docs/decisions), and the product spec is in [`docs/prd-unread.md`](https://github.com/codewithveek/unread/blob/main/docs/prd-unread.md). Integration tests run against real EmbeddingGemma, real Kokoro, real ffmpeg and Temporal's time-skipping test server, not mocks.
+Unread is MIT-licensed. The repo was started on October 23, inside the challenge window. Every third-party choice is written up as a decision record in [`docs/decisions/`](https://github.com/codewithveek/unread/tree/main/docs/decisions), and the product spec is in [`docs/prd-unread.md`](https://github.com/codewithveek/unread/blob/main/docs/prd-unread.md). Integration tests run against real EmbeddingGemma, real Kokoro, real ffmpeg and Temporal's time-skipping test server, not mocks.
 
 ## How I Built It
 
